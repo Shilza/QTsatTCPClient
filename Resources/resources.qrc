@@ -1,0 +1,26 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>default.png</file>
+        <file>eye.png</file>
+        <file>close1.png</file>
+        <file>close2.png</file>
+        <file>min1.png</file>
+        <file>min2.png</file>
+        <file>pre.svg</file>
+        <file>gradient.png</file>
+        <file>affix.png</file>
+        <file>affix30.png</file>
+        <file>affix30gray.png</file>
+        <file>photos.png</file>
+        <file>videos.png</file>
+        <file>audios.png</file>
+        <file>documents.png</file>
+        <file>documentsGray.png</file>
+        <file>photosGray.png</file>
+        <file>videosGray.png</file>
+        <file>audiosGray.png</file>
+        <file>affixClose.png</file>
+        <file>toolTipAffixClose.png</file>
+        <file>originalSize.png</file>
+    </qresource>
+</RCC>
