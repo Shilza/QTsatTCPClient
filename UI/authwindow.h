@@ -5,7 +5,7 @@
 #include <QLabel>
 #include <QtSvg/QSvgWidget>
 #include <QLineEdit>
-#include <QUdpSocket>
+#include <QTcpSocket>
 #include <QPushButton>
 #include <QMouseEvent>
 #include <QRegExpValidator>
@@ -20,6 +20,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QNetworkReply>
+#include <QHostAddress>
 #include "UI/Widgets/authlineedit.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "Config/def.h"
@@ -76,11 +77,11 @@ private:
     ClickableLabel *labelForgotPass;
     ClickableLabel *labelSignUp;
     ClickableLabel *labelSignIn;
-    ClickableLabel *labelConnectionFailed;
-    ClickableLabel *labelConnectionFailedBackground;
+    ClickableLabel *labelError;
+    ClickableLabel *labelErrorBackground;
     ClickableLabel *labelSuccess;
 
-    QUdpSocket *socket;
+    QTcpSocket *socket;
     QHostAddress host;
 
     QSvgWidget *preloader;
@@ -130,7 +131,6 @@ private slots:
     void waitingAnswer();
 
     void checkingNickname();
-    void checkingEmail();
     void checkingConfirming(QString);
     void checkingRecoveryConfirming(QString);
 
@@ -138,6 +138,7 @@ private slots:
     void changingRecoveryPassEchoMode();
     void changingPassBorder();
     void changingRecoveryPassBorder();
+    void changingStateOfNicknameExist();
 
     void buttonMinimize_released();
 
@@ -146,8 +147,6 @@ private slots:
 
     void errorHide();
     void labelSuccessHide();
-    void test();
-    void test2();
 };
 
 #endif // AUTHWINDOW_H
