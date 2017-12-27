@@ -8,7 +8,7 @@ QT       += core gui
 QT       += core
 QT       += network
 QT += svg
-//CONFIG   += c++11 console
+CONFIG   += c++11 console
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -30,9 +30,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         UI/mainwindow.cpp \
-    Util/udpclient.cpp \
     UI/authwindow.cpp \
-    Util/distance_damerau_levenshtein.cpp \
     Util/floodtimer.cpp \
     UI/Widgets/authlineedit.cpp \
     UI/Widgets/clickablelabel.cpp \
@@ -41,14 +39,13 @@ SOURCES += \
     UI/Widgets/wraplabel.cpp \
     UI/Widgets/affiximagewidget.cpp \
     UI/Widgets/sendwidget.cpp \
-    UI/Widgets/imageview.cpp
+    UI/Widgets/imageview.cpp \
+    Util/tcpclient.cpp
 
 HEADERS += \
         UI/mainwindow.h \
-    Util/udpclient.h \
     Config/def.h \
     UI/authwindow.h \
-    Util/distance_damerau_levenshtein.h \
     UI/Widgets/clickablelabel.h \
     Util/floodtimer.h \
     UI/Widgets/authlineedit.h \
@@ -57,7 +54,8 @@ HEADERS += \
     UI/Widgets/wraplabel.h \
     UI/Widgets/affiximagewidget.h \
     UI/Widgets/sendwidget.h \
-    UI/Widgets/imageview.h
+    UI/Widgets/imageview.h \
+    Util/tcpclient.h
 
 FORMS += \
         UI/mainwindow.ui \

@@ -16,7 +16,7 @@
 #include "UI/Widgets/globaltextedit.h"
 #include "UI/Widgets/privatetextedit.h"
 #include "UI/Widgets/wraplabel.h"
-#include "Util/udpclient.h"
+#include "Util/tcpclient.h"
 
 namespace Ui {
 class MainWindow;
@@ -28,7 +28,7 @@ class MainWindow : public QMainWindow
 
 private:
     Ui::MainWindow *ui;
-    UDPClient *client;
+    TCPClient *client;
 
     QStackedWidget *stackOfWidgets;
     QWidget *mainWidget;
@@ -53,10 +53,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private slots:
-    void sendMessage();
+    void sendMessage(QString);
     void printMessages();
 public slots:
-    void start(QByteArray sessionKey);
+    void start(QTcpSocket*);
 };
 
 #endif // MAINWINDOW_H

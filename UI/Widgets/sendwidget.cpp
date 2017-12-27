@@ -220,37 +220,8 @@ void SendWidget::showSymbolsCount(){
     labelSymbolsCount->show();
 }
 
-void SendWidget::send()
-{
-    QString text = textMessage->toPlainText();
-    if(lastMessages.size()>=3){
-        QVector<quint8> levenshteinDistances;
-        for(QString comparisonString : lastMessages)
-            levenshteinDistances.push_back(levenshteinDistance(text.toStdString(), comparisonString.toStdString()));
-        quint8 count=0;
-        for(quint8 temp : levenshteinDistances){
-            if(temp<=(text.length()/2 < 1 ? 1 : text.length()/2))
-                count++;
-        }
-        if(count>=3 && floodTimer->getCounter()<3){
-            labelFloodError->show();
-            labelTimerShow->show();
-            textMessage->setDisabled(true);
-            buttonSend->setDisabled(true);
-            buttonAffix->setDisabled(true);
-            floodTimer->start();
-            return;
-        }
-        else if(count>=3){
-            labelBan->show();
-            textMessage->setDisabled(true);
-        }
-    }
-    if(lastMessages.size()==5)
-        lastMessages.pop_front();
-    lastMessages.push_back(text);
-
-    emit messageSended();
+void SendWidget::send(){
+    emit messageSended(textMessage->toPlainText());
 }
 
 void SendWidget::imageReceivedRedirect(QPixmap image){

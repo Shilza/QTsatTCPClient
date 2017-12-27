@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    client = new UDPClient;
     resize(660,444);
 
     mainWidget = new QWidget(this);
@@ -110,28 +109,23 @@ MainWindow::MainWindow(QWidget *parent) :
     stackOfWidgets->addWidget(globalChatWidget);
     stackOfWidgets->setCurrentWidget(globalChatWidget);
 
-    connect(sendWidget, SIGNAL(messageSended()), this, SLOT(printMessages()));
-    connect(sendWidget, SIGNAL(messageSended()), this, SLOT(sendMessage()));
+    //connect(sendWidget, SIGNAL(messageSended()), this, SLOT(printMessages()));
+    connect(sendWidget, SIGNAL(messageSended(QString)), this, SLOT(sendMessage(QString)));
     connect(sendWidget, SIGNAL(imageReceived(QPixmap)), affixImageWidget, SLOT(receivedImageTreatment(QPixmap)));
     connect(affixImageWidget, SIGNAL(originalSizeReleased(QPixmap)), imageView, SLOT(setPicture(QPixmap)));
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 }
 
-void MainWindow::start(QByteArray sessionKey){
-    client->sessionKey = sessionKey;
-    this->show();
+void MainWindow::start(QTcpSocket *socket){
+    client = new TCPClient(socket, this);
+    show();
 }
 
-void MainWindow::sendMessage(){
+void MainWindow::sendMessage(QString message){
 
-    /*    QString a = ui->textEdit->toPlainText();
+    if(message!="")
+        client->sendMessage(message);
 
-    if(a!=NULL){
-        ui->textEdit->clear();
-        client->sendMessage(client->sessionKey+'|'+a);
-        client->sendMessage(nickname + '|' + client->sessionKey+'|' + '|' +  + '|'+a);
-    }
-*/
 }
 
 void MainWindow::printMessages(){

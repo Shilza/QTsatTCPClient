@@ -3,12 +3,10 @@
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QQueue>
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QPropertyAnimation>
 #include "Util/floodtimer.h"
-#include "Util/distance_damerau_levenshtein.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "UI/Widgets/globaltextedit.h"
 
@@ -43,13 +41,11 @@ private:
 
     FloodTimer *floodTimer;
 
-    QQueue<QString> lastMessages;
-
     quint8 countOfAttachment=0;
 
     bool eventFilter(QObject *target, QEvent *event);
 signals:
-    void messageSended();
+    void messageSended(QString);
     void imageReceived(QPixmap);
 private slots:
     void floodErrorHide();

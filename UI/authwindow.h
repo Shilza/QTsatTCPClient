@@ -107,7 +107,7 @@ public:
     ~AuthWindow();
 
 signals:
-    void sessionKeyReceived(QByteArray sessionKey);
+    void startMainWindow(QTcpSocket*);
     void loadingWasStart();
     void errorHasOccured();
 
