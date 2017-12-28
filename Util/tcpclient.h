@@ -15,13 +15,28 @@ private:
     QTcpSocket *socket;
     QHostAddress host;
 
+    TCPClient(QObject *parent = 0);
+
+    TCPClient(TCPClient const&) = delete;
+    TCPClient& operator= (TCPClient const&) = delete;
+
 public:
-    explicit TCPClient(QTcpSocket *socket, QObject *parent = 0);
+    static TCPClient& getInstance();
     void sendMessage(QString msg);
+    void send(QByteArray);
     QByteArray buffer;
     QString nickname;
+
 signals:
     void updating();
+    void authorization(QString);
+    void nicknameExisting(QString);
+    void registration(QString);
+    void registrationCode(QString);
+    void recovery(QString);
+    void recoveryCode(QString);
+    void recoveryNewPass(QString);
+
 private slots:
     void reading();
 };

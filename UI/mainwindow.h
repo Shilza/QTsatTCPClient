@@ -28,7 +28,6 @@ class MainWindow : public QMainWindow
 
 private:
     Ui::MainWindow *ui;
-    TCPClient *client;
 
     QStackedWidget *stackOfWidgets;
     QWidget *mainWidget;
@@ -56,7 +55,7 @@ private slots:
     void sendMessage(QString);
     void printMessages();
 public slots:
-    void start(QTcpSocket*);
+    void start();
 };
 
 #endif // MAINWINDOW_H

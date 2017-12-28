@@ -24,6 +24,7 @@
 #include "UI/Widgets/authlineedit.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "Config/def.h"
+#include "Util/tcpclient.h"
 
 #define DURATION 300
 #define LOC_SIGNIN 1
@@ -81,9 +82,6 @@ private:
     ClickableLabel *labelErrorBackground;
     ClickableLabel *labelSuccess;
 
-    QTcpSocket *socket;
-    QHostAddress host;
-
     QSvgWidget *preloader;
     QGraphicsOpacityEffect *opacity;
     QGraphicsOpacityEffect *opacityLabel;
@@ -107,13 +105,11 @@ public:
     ~AuthWindow();
 
 signals:
-    void startMainWindow(QTcpSocket*);
+    void startMainWindow();
     void loadingWasStart();
     void errorHasOccured();
 
 private slots:
-    void socketReading();
-
     void signIn_released();
     void authorizationSend();
     void signUp_released();
@@ -147,6 +143,14 @@ private slots:
 
     void errorHide();
     void labelSuccessHide();
+
+    void authorizationReceived(QString);
+    void nicknameExisting(QString);
+    void registrationReceived(QString);
+    void registrationCodeReceived(QString);
+    void recoveryReceived(QString);
+    void recoveryCodeReceived(QString);
+    void recoveryNewPassReceived(QString);
 };
 
 #endif // AUTHWINDOW_H

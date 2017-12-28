@@ -6,10 +6,6 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     ui(new Ui::AuthWindow)
 {
     ui->setupUi(this);
-    socket = new QTcpSocket(parent);//temporary
-
-    host.setAddress(HOST_IP);
-    socket->connectToHost(QHostAddress::LocalHost, 40000);
 
     timerWaitingAnswer = new QTimer(this);
     timerWaitingAnswer->setInterval(10000);
@@ -255,7 +251,7 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
 
     preloader->close();
 
-    connect(socket, SIGNAL(readyRead()),this,SLOT(socketReading()));
+//    connect(socket, SIGNAL(readyRead()), this, SLOT(socketReading()));
 
     connect(this, SIGNAL(loadingWasStart()),this, SLOT(startPreloading()));
     connect(this, SIGNAL(errorHasOccured()), this, SLOT(cancelPreloading()));
@@ -285,275 +281,16 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     connect(timerWaitingAnswer, SIGNAL(timeout()), this, SLOT(waitingAnswer()));
     connect(timerLabelSuccess, SIGNAL(timeout()), this, SLOT(labelSuccessHide()));
     connect(timerErrorLabel, SIGNAL(timeout()), this, SLOT(errorHide()));
+
+    connect(&(TCPClient::getInstance()), SIGNAL(authorization(QString)), SLOT(authorizationReceived(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(registration(QString)), SLOT(registrationReceived(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(registrationCode(QString)), SLOT(registrationCodeReceived(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(recovery(QString)), SLOT(recoveryReceived(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(recoveryCode(QString)), SLOT(recoveryCodeReceived(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(recoveryNewPass(QString)), SLOT(recoveryNewPassReceived(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(nicknameExisting(QString)), SLOT(nicknameExisting(QString)));
 }
 
-
-void AuthWindow::socketReading(){
-    timerWaitingAnswer->stop();
-
-    QByteArray receivedObject = socket->readAll();
-    QJsonParseError error;
-
-    QJsonObject response = QJsonDocument::fromJson(receivedObject, &error).object();
-
-    if(error.error == QJsonParseError::NoError){
-        if(response.value("Target").toString() == "Authorization"){
-            if(response.value("Value").toString() == "Authorization failed"){
-                labelError->setText("Invalid password or nickname");
-                emit errorHasOccured();
-            }
-            else if(response.value("Value").toString() == "Authorization successful"){
-                emit startMainWindow(socket);
-                close();
-            }
-        }
-        else if(response.value("Target").toString() == "DoesNicknameExist"){
-            if(response.value("Value").toString() == "Nickname exists"){
-                nicknameExists = true;
-                lineLog->setErrorStyleSheet();
-            }
-            else if(response.value("Value").toString() == "Nickname doesn't exist"){
-                nicknameExists = false;
-                labelUncorrectNickname->close();
-                lineLog->setDefaultStyleSheet();
-            }
-        }
-        else if(response.value("Target").toString() == "Registration"){
-            if(response.value("Value").toString() == "Email exists"){
-                labelError->setText("Email already exists");
-                emit errorHasOccured();
-            }
-            else if(response.value("Value").toString() == "Email doesn't exist"){
-                preloader->close();
-                labelSuccess->show();
-                lineConfirmCode->show();
-                buttonSignUp->show();
-                opacity->setOpacity(1.0);
-                labelSuccess->setText("Сheck your email for confirmation code");
-                lineConfirmCode->setEnabledOverride();
-
-                QPropertyAnimation *animations[6];
-                animations[0] = new QPropertyAnimation(labelPass, "pos");
-                animations[1] = new QPropertyAnimation(lineConfirmPass, "pos");
-                animations[2] = new QPropertyAnimation(lineConfirmCode, "pos");
-                animations[3] = new QPropertyAnimation(buttonSignUp, "pos");
-                animations[4] = new QPropertyAnimation(labelSignIn, "pos");
-                animations[5] = new QPropertyAnimation(opacityLabel, "opacity");
-
-                animations[0]->setEndValue(QPoint(width(), labelPass->y()));
-                animations[1]->setEndValue(QPoint(width(), lineConfirmPass->y()));
-                animations[2]->setStartValue(QPoint(defaultLineX, height()));
-                animations[2]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
-                animations[3]->setStartValue(QPoint(defaultButtonX, height()+lineHWithSpace));
-                animations[3]->setEndValue(QPoint(defaultButtonX, defaultY+(2*lineHWithSpace)));
-                animations[4]->setEndValue(QPoint(labelSignIn->x(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
-                animations[5]->setStartValue(0.0);
-                animations[5]->setEndValue(1.0);
-
-                for(int i=0; i<5; i++){
-                    animations[i]->setDuration(DURATION);
-                    animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
-                }
-
-                animations[5]->setDuration(DURATION*2);
-                animations[5]->start(QAbstractAnimation::DeleteWhenStopped);
-                timerLabelSuccess->start();
-                location = LOC_REGISTRATION_CODE;
-            }
-        }
-        else if(response.value("Target").toString() == "Registration code"){
-            if(response.value("Value").toString() == "Registration successful"){
-                preloader->close();
-                labelSuccess->setText("Registration completed successfully");
-
-                labelSignUp->show();
-                labelSuccess->show();
-                lineLog->setEnabledOverride();
-                setPassEnabled();
-
-                QPropertyAnimation *animations[6];
-                animations[0] = new QPropertyAnimation(opacityLabel, "opacity");
-                animations[1] = new QPropertyAnimation(lineEmail, "pos");
-                animations[2] = new QPropertyAnimation(labelPass, "pos");
-                animations[3] = new QPropertyAnimation(buttonSignIn, "pos");
-                animations[4] = new QPropertyAnimation(labelForgotPass, "pos");
-                animations[5] = new QPropertyAnimation(labelSignUp, "pos");
-
-                animations[0]->setStartValue(0.0);
-                animations[0]->setEndValue(1.0);
-                animations[1]->setEndValue(QPoint(width(), lineEmail->y()));
-                animations[2]->setStartValue(QPoint(-lineW, defaultY+lineHWithSpace));
-                animations[2]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
-                animations[3]->setStartValue(QPoint(defaultButtonX, height()));
-                animations[3]->setEndValue(QPoint(defaultButtonX, defaultY+(2*lineHWithSpace)));
-                animations[4]->setStartValue(QPoint(defaultLineX, height()+buttonHWithSpace));
-                animations[4]->setEndValue(QPoint(defaultLineX, defaultY+(2*lineHWithSpace)+buttonHWithSpace));
-                animations[5]->setStartValue(QPoint(defaultLineX+lineW-labelSignUp->width(), height()+buttonHWithSpace));
-                animations[5]->setEndValue(QPoint(defaultLineX+lineW-labelSignUp->width(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
-
-                for(int i=1; i<6; i++){
-                    animations[i]->setDuration(DURATION);
-                    animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
-                }
-                animations[0]->setDuration(DURATION*2);
-                animations[0]->start(QAbstractAnimation::DeleteWhenStopped);
-
-                location = LOC_SIGNIN;
-                timerLabelSuccess->start();
-            }
-            else if(response.value("Value").toString() == "Invalid code"){
-                labelError->setText("Invalid confirmation code");
-                emit errorHasOccured();
-            }
-        }
-        else if(response.value("Target").toString() == "Recovery"){
-            if(response.value("Value").toString() == "Founded"){
-                preloader->close();
-                location = LOC_RECOVERY_CODE;
-                QPropertyAnimation *animations[4];
-                animations[0] = new QPropertyAnimation(lineConfirmCode, "pos");
-                animations[1] = new QPropertyAnimation(buttonOk, "pos");
-                animations[2] = new QPropertyAnimation(labelSignIn, "pos");
-                animations[3] = new QPropertyAnimation(labelSignUp, "pos");
-
-                lineConfirmCode->show();
-                animations[0]->setDuration(DURATION);
-                animations[0]->setStartValue(QPoint(defaultLineX, height()));
-                animations[0]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
-                animations[0]->start(QAbstractAnimation::DeleteWhenStopped);
-
-                opacity->setOpacity(1.0);
-                buttonOk->show();
-                animations[1]->setDuration(DURATION);
-                animations[1]->setStartValue(QPoint(buttonOk->x(), height()));
-                animations[1]->setEndValue(QPoint(buttonOk->x(), defaultY+(2*lineHWithSpace)));
-                animations[1]->start(QAbstractAnimation::DeleteWhenStopped);
-
-                animations[2]->setDuration(DURATION);
-                animations[2]->setEndValue(QPoint(labelSignIn->x(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
-                animations[2]->start(QAbstractAnimation::DeleteWhenStopped);
-
-                animations[3]->setDuration(DURATION);
-                animations[3]->setEndValue(QPoint(labelSignUp->x(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
-                animations[3]->start(QAbstractAnimation::DeleteWhenStopped);
-            }
-            else if(response.value("Value").toString() == "Not founded"){
-                labelError->setText("Nickname or email not found");
-                emit errorHasOccured();
-            }
-        }
-        else if(response.value("Target").toString() == "Recovery code"){
-            if(response.value("Value").toString() == "Right code"){
-                location = LOC_RECOVERY_PASS;
-                preloader->close();
-                QPropertyAnimation *animations[6];
-                animations[0] = new QPropertyAnimation(lineConfirmCode, "pos");
-                animations[1] = new QPropertyAnimation(labelRecoveryPass, "pos");
-                animations[2] = new QPropertyAnimation(lineRecoveryConfirmPass, "pos");
-                animations[3] = new QPropertyAnimation(opacity, "opacity");
-                animations[4] = new QPropertyAnimation(labelSignIn, "pos");
-                animations[5] = new QPropertyAnimation(labelSignUp, "pos");
-
-                labelRecoveryPass->show();
-                lineRecoveryConfirmPass->show();
-                labelRecoveryPass->setEnabled(true);
-                lineRecoveryPass->setEnabled(true);
-                buttonRecoveryEye->setEnabled(true);
-                lineRecoveryPass->setStyleSheet(QString("AuthLineEdit{"
-                                                        "font-family: Century Gothic;"
-                                                        "font-size: %1px;"
-                                                        "background: transparent;"
-                                                        "border: 1px solid gray;"
-                                                        "border-right: 0px;"
-                                                        "color: #B5EBEE;"
-                                                        "}").arg(defaultFontSize));
-                buttonRecoveryEye->setStyleSheet("QPushButton{"
-                                                 "background: transparent;"
-                                                 "border: 1px solid gray;"
-                                                 "border-left: 0px solid gray;"
-                                                 "}");
-                lineRecoveryConfirmPass->setEnabledOverride();
-
-                animations[0]->setEndValue(QPoint(width(), lineConfirmCode->y()));
-                animations[1]->setStartValue(QPoint(defaultLineX, height()));
-                animations[1]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
-                animations[2]->setStartValue(QPoint(defaultLineX, height()+lineHWithSpace));
-                animations[2]->setEndValue(QPoint(defaultLineX, defaultY+(2*lineHWithSpace)));
-                animations[3]->setEndValue(1.0);
-                animations[4]->setEndValue(QPoint(labelSignIn->x(), defaultY+(3*lineHWithSpace)+buttonHWithSpace));
-                animations[5]->setEndValue(QPoint(labelSignUp->x(), defaultY+(3*lineHWithSpace)+buttonHWithSpace));
-
-                buttonOk->move(defaultButtonX, defaultY+(3*lineHWithSpace));
-                buttonOk->show();
-
-                connect(animations[0], SIGNAL(finished()), lineConfirmCode, SLOT(clear()));
-                for(int i=0; i<6; i++){
-                    animations[i]->setDuration(DURATION);
-                    animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
-                }
-            }
-            else if(response.value("Value").toString() == "Invalid code"){
-                labelError->setText("Invalid confirmation code");
-                emit errorHasOccured();
-            }
-        }
-        else if(response.value("Target").toString() == "Recovery new pass"){
-            if(response.value("Value").toString() == "Password changed successfully"){
-                labelSuccess->setText("Your password has been changed succesfully");
-
-                location=LOC_SIGNIN;
-                lineLog->setEnabledOverride();
-                preloader->close();
-                labelSignIn->close();
-
-                QPropertyAnimation *animations[5];
-                animations[0] = new QPropertyAnimation(lineRecoveryConfirmPass, "pos");
-                animations[1] = new QPropertyAnimation(buttonSignIn, "pos");
-                animations[2] = new QPropertyAnimation(labelSignUp, "pos");
-                animations[3] = new QPropertyAnimation(labelForgotPass, "pos");
-                animations[4] = new QPropertyAnimation(opacityLabel, "opacity");
-
-                animations[0]->setEndValue(QPoint(width(), lineRecoveryConfirmPass->y()));
-                animations[1]->setStartValue(QPoint(defaultButtonX, height()));
-                animations[1]->setEndValue(QPoint(defaultButtonX, defaultY+(2*lineHWithSpace)));
-                animations[2]->setStartValue(QPoint(defaultLineX+lineW-labelSignUp->width(), height()+buttonHWithSpace));
-                animations[2]->setEndValue(QPoint(defaultLineX+lineW-labelSignUp->width(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
-                animations[3]->setStartValue(QPoint(defaultLineX, height()+buttonHWithSpace));
-                animations[3]->setEndValue(QPoint(defaultLineX, defaultY+(2*lineHWithSpace)+buttonHWithSpace));
-                animations[4]->setStartValue(0.0);
-                animations[4]->setEndValue(1.0);
-
-                animations[0]->setDuration(DURATION);
-                animations[1]->setDuration(DURATION);
-                animations[2]->setDuration(DURATION);
-                animations[3]->setDuration(DURATION);
-                animations[4]->setDuration(DURATION);
-
-                buttonSignIn->show();
-                labelSignUp->show();
-                labelForgotPass->show();
-                labelPass->move(labelRecoveryPass->x(), labelRecoveryPass->y());
-                labelRecoveryPass->close();
-                lineRecoveryPass->clear();
-                lineRecoveryConfirmPass->clear();
-                labelPass->show();
-                labelSuccess->show();
-
-                connect(animations[0], SIGNAL(finished()), lineRecoveryConfirmPass, SLOT(close()));
-                animations[0]->start(QAbstractAnimation::DeleteWhenStopped);
-                animations[1]->start(QAbstractAnimation::DeleteWhenStopped);
-                animations[2]->start(QAbstractAnimation::DeleteWhenStopped);
-                animations[3]->start(QAbstractAnimation::DeleteWhenStopped);
-                animations[4]->start(QAbstractAnimation::DeleteWhenStopped);
-
-                timerLabelSuccess->start();
-            }
-            else if(response.value("Value").toString() == "Password hasn't been changed"){
-                //TODO
-            }
-        }
-    }
-}
 
 void AuthWindow::signIn_released(){
     QString log = lineLog->text();
@@ -598,7 +335,7 @@ void AuthWindow::authorizationSend(){
     request.insert("Target", "Authorization");
     request.insert("Login", lineLog->text());
     request.insert("Password", linePass->text());
-    socket->write(QJsonDocument(request).toJson());
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 
@@ -676,7 +413,7 @@ void AuthWindow::registrationSend(){
     request.insert("Target", "Registration");
     request.insert("Email", lineEmail->text());
     request.insert("Nickname", lineLog->text());
-    socket->write(QJsonDocument(request).toJson());
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 void AuthWindow::registrationCodeSend(){
@@ -686,7 +423,7 @@ void AuthWindow::registrationCodeSend(){
     request.insert("Nickname", lineLog->text());
     request.insert("Password", linePass->text());
     request.insert("Code", lineConfirmCode->text());
-    socket->write(QJsonDocument(request).toJson());
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 void AuthWindow::labelSuccessHide(){
@@ -700,6 +437,276 @@ void AuthWindow::labelSuccessHide(){
 
     if(location==LOC_REGISTRATION){
         connect(animation, SIGNAL(finished()), this, SLOT(gotoSignInLoc()));
+    }
+}
+
+
+void AuthWindow::authorizationReceived(QString value){
+    timerWaitingAnswer->stop();
+    if(value == "Authorization failed"){
+        labelError->setText("Invalid password or nickname");
+        emit errorHasOccured();
+    }
+    else if(value == "Authorization successful"){
+        emit startMainWindow();
+        close();
+    }
+}
+
+void AuthWindow::nicknameExisting(QString value){
+    timerWaitingAnswer->stop();
+    if(value == "Nickname exists"){
+        nicknameExists = true;
+        lineLog->setErrorStyleSheet();
+    }
+    else if(value == "Nickname doesn't exist"){
+        nicknameExists = false;
+        labelUncorrectNickname->close();
+        lineLog->setDefaultStyleSheet();
+    }
+}
+
+void AuthWindow::registrationReceived(QString value){
+    timerWaitingAnswer->stop();
+    if(value == "Email exists"){
+        labelError->setText("Email already exists");
+        emit errorHasOccured();
+    }
+    else if(value == "Email doesn't exist"){
+        preloader->close();
+        labelSuccess->show();
+        lineConfirmCode->show();
+        buttonSignUp->show();
+        opacity->setOpacity(1.0);
+        labelSuccess->setText("Сheck your email for confirmation code");
+        lineConfirmCode->setEnabledOverride();
+
+        QPropertyAnimation *animations[6];
+        animations[0] = new QPropertyAnimation(labelPass, "pos");
+        animations[1] = new QPropertyAnimation(lineConfirmPass, "pos");
+        animations[2] = new QPropertyAnimation(lineConfirmCode, "pos");
+        animations[3] = new QPropertyAnimation(buttonSignUp, "pos");
+        animations[4] = new QPropertyAnimation(labelSignIn, "pos");
+        animations[5] = new QPropertyAnimation(opacityLabel, "opacity");
+
+        animations[0]->setEndValue(QPoint(width(), labelPass->y()));
+        animations[1]->setEndValue(QPoint(width(), lineConfirmPass->y()));
+        animations[2]->setStartValue(QPoint(defaultLineX, height()));
+        animations[2]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
+        animations[3]->setStartValue(QPoint(defaultButtonX, height()+lineHWithSpace));
+        animations[3]->setEndValue(QPoint(defaultButtonX, defaultY+(2*lineHWithSpace)));
+        animations[4]->setEndValue(QPoint(labelSignIn->x(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
+        animations[5]->setStartValue(0.0);
+        animations[5]->setEndValue(1.0);
+
+        for(int i=0; i<5; i++){
+            animations[i]->setDuration(DURATION);
+            animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
+        }
+
+        animations[5]->setDuration(DURATION*2);
+        animations[5]->start(QAbstractAnimation::DeleteWhenStopped);
+        timerLabelSuccess->start();
+        location = LOC_REGISTRATION_CODE;
+    }
+}
+
+void AuthWindow::registrationCodeReceived(QString value){
+    timerWaitingAnswer->stop();
+    if(value == "Registration successful"){
+        preloader->close();
+        labelSuccess->setText("Registration completed successfully");
+
+        labelSignUp->show();
+        labelSuccess->show();
+        lineLog->setEnabledOverride();
+        setPassEnabled();
+
+        QPropertyAnimation *animations[6];
+        animations[0] = new QPropertyAnimation(opacityLabel, "opacity");
+        animations[1] = new QPropertyAnimation(lineEmail, "pos");
+        animations[2] = new QPropertyAnimation(labelPass, "pos");
+        animations[3] = new QPropertyAnimation(buttonSignIn, "pos");
+        animations[4] = new QPropertyAnimation(labelForgotPass, "pos");
+        animations[5] = new QPropertyAnimation(labelSignUp, "pos");
+
+        animations[0]->setStartValue(0.0);
+        animations[0]->setEndValue(1.0);
+        animations[1]->setEndValue(QPoint(width(), lineEmail->y()));
+        animations[2]->setStartValue(QPoint(-lineW, defaultY+lineHWithSpace));
+        animations[2]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
+        animations[3]->setStartValue(QPoint(defaultButtonX, height()));
+        animations[3]->setEndValue(QPoint(defaultButtonX, defaultY+(2*lineHWithSpace)));
+        animations[4]->setStartValue(QPoint(defaultLineX, height()+buttonHWithSpace));
+        animations[4]->setEndValue(QPoint(defaultLineX, defaultY+(2*lineHWithSpace)+buttonHWithSpace));
+        animations[5]->setStartValue(QPoint(defaultLineX+lineW-labelSignUp->width(), height()+buttonHWithSpace));
+        animations[5]->setEndValue(QPoint(defaultLineX+lineW-labelSignUp->width(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
+
+        for(int i=1; i<6; i++){
+            animations[i]->setDuration(DURATION);
+            animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
+        }
+        animations[0]->setDuration(DURATION*2);
+        animations[0]->start(QAbstractAnimation::DeleteWhenStopped);
+
+        location = LOC_SIGNIN;
+        timerLabelSuccess->start();
+    }
+    else if(value == "Invalid code"){
+        labelError->setText("Invalid confirmation code");
+        emit errorHasOccured();
+    }
+}
+
+void AuthWindow::recoveryReceived(QString value){
+    timerWaitingAnswer->stop();
+    if(value == "Founded"){
+        preloader->close();
+        location = LOC_RECOVERY_CODE;
+        QPropertyAnimation *animations[4];
+        animations[0] = new QPropertyAnimation(lineConfirmCode, "pos");
+        animations[1] = new QPropertyAnimation(buttonOk, "pos");
+        animations[2] = new QPropertyAnimation(labelSignIn, "pos");
+        animations[3] = new QPropertyAnimation(labelSignUp, "pos");
+
+        lineConfirmCode->show();
+        animations[0]->setDuration(DURATION);
+        animations[0]->setStartValue(QPoint(defaultLineX, height()));
+        animations[0]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
+        animations[0]->start(QAbstractAnimation::DeleteWhenStopped);
+
+        opacity->setOpacity(1.0);
+        buttonOk->show();
+        animations[1]->setDuration(DURATION);
+        animations[1]->setStartValue(QPoint(buttonOk->x(), height()));
+        animations[1]->setEndValue(QPoint(buttonOk->x(), defaultY+(2*lineHWithSpace)));
+        animations[1]->start(QAbstractAnimation::DeleteWhenStopped);
+
+        animations[2]->setDuration(DURATION);
+        animations[2]->setEndValue(QPoint(labelSignIn->x(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
+        animations[2]->start(QAbstractAnimation::DeleteWhenStopped);
+
+        animations[3]->setDuration(DURATION);
+        animations[3]->setEndValue(QPoint(labelSignUp->x(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
+        animations[3]->start(QAbstractAnimation::DeleteWhenStopped);
+    }
+    else if(value == "Not founded"){
+        labelError->setText("Nickname or email not found");
+        emit errorHasOccured();
+    }
+}
+
+void AuthWindow::recoveryCodeReceived(QString value){
+    timerWaitingAnswer->stop();
+    if(value == "Right code"){
+        location = LOC_RECOVERY_PASS;
+        preloader->close();
+        QPropertyAnimation *animations[6];
+        animations[0] = new QPropertyAnimation(lineConfirmCode, "pos");
+        animations[1] = new QPropertyAnimation(labelRecoveryPass, "pos");
+        animations[2] = new QPropertyAnimation(lineRecoveryConfirmPass, "pos");
+        animations[3] = new QPropertyAnimation(opacity, "opacity");
+        animations[4] = new QPropertyAnimation(labelSignIn, "pos");
+        animations[5] = new QPropertyAnimation(labelSignUp, "pos");
+
+        labelRecoveryPass->show();
+        lineRecoveryConfirmPass->show();
+        labelRecoveryPass->setEnabled(true);
+        lineRecoveryPass->setEnabled(true);
+        buttonRecoveryEye->setEnabled(true);
+        lineRecoveryPass->setStyleSheet(QString("AuthLineEdit{"
+                                                "font-family: Century Gothic;"
+                                                "font-size: %1px;"
+                                                "background: transparent;"
+                                                "border: 1px solid gray;"
+                                                "border-right: 0px;"
+                                                "color: #B5EBEE;"
+                                                "}").arg(defaultFontSize));
+        buttonRecoveryEye->setStyleSheet("QPushButton{"
+                                         "background: transparent;"
+                                         "border: 1px solid gray;"
+                                         "border-left: 0px solid gray;"
+                                         "}");
+        lineRecoveryConfirmPass->setEnabledOverride();
+
+        animations[0]->setEndValue(QPoint(width(), lineConfirmCode->y()));
+        animations[1]->setStartValue(QPoint(defaultLineX, height()));
+        animations[1]->setEndValue(QPoint(defaultLineX, defaultY+lineHWithSpace));
+        animations[2]->setStartValue(QPoint(defaultLineX, height()+lineHWithSpace));
+        animations[2]->setEndValue(QPoint(defaultLineX, defaultY+(2*lineHWithSpace)));
+        animations[3]->setEndValue(1.0);
+        animations[4]->setEndValue(QPoint(labelSignIn->x(), defaultY+(3*lineHWithSpace)+buttonHWithSpace));
+        animations[5]->setEndValue(QPoint(labelSignUp->x(), defaultY+(3*lineHWithSpace)+buttonHWithSpace));
+
+        buttonOk->move(defaultButtonX, defaultY+(3*lineHWithSpace));
+        buttonOk->show();
+
+        connect(animations[0], SIGNAL(finished()), lineConfirmCode, SLOT(clear()));
+        for(int i=0; i<6; i++){
+            animations[i]->setDuration(DURATION);
+            animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
+        }
+    }
+    else if(value == "Invalid code"){
+        labelError->setText("Invalid confirmation code");
+        emit errorHasOccured();
+    }
+}
+
+void AuthWindow::recoveryNewPassReceived(QString value){
+    timerWaitingAnswer->stop();
+    if(value == "Password changed successfully"){
+        labelSuccess->setText("Your password has been changed succesfully");
+
+        location=LOC_SIGNIN;
+        lineLog->setEnabledOverride();
+        preloader->close();
+        labelSignIn->close();
+
+        QPropertyAnimation *animations[5];
+        animations[0] = new QPropertyAnimation(lineRecoveryConfirmPass, "pos");
+        animations[1] = new QPropertyAnimation(buttonSignIn, "pos");
+        animations[2] = new QPropertyAnimation(labelSignUp, "pos");
+        animations[3] = new QPropertyAnimation(labelForgotPass, "pos");
+        animations[4] = new QPropertyAnimation(opacityLabel, "opacity");
+
+        animations[0]->setEndValue(QPoint(width(), lineRecoveryConfirmPass->y()));
+        animations[1]->setStartValue(QPoint(defaultButtonX, height()));
+        animations[1]->setEndValue(QPoint(defaultButtonX, defaultY+(2*lineHWithSpace)));
+        animations[2]->setStartValue(QPoint(defaultLineX+lineW-labelSignUp->width(), height()+buttonHWithSpace));
+        animations[2]->setEndValue(QPoint(defaultLineX+lineW-labelSignUp->width(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
+        animations[3]->setStartValue(QPoint(defaultLineX, height()+buttonHWithSpace));
+        animations[3]->setEndValue(QPoint(defaultLineX, defaultY+(2*lineHWithSpace)+buttonHWithSpace));
+        animations[4]->setStartValue(0.0);
+        animations[4]->setEndValue(1.0);
+
+        animations[0]->setDuration(DURATION);
+        animations[1]->setDuration(DURATION);
+        animations[2]->setDuration(DURATION);
+        animations[3]->setDuration(DURATION);
+        animations[4]->setDuration(DURATION);
+
+        buttonSignIn->show();
+        labelSignUp->show();
+        labelForgotPass->show();
+        labelPass->move(labelRecoveryPass->x(), labelRecoveryPass->y());
+        labelRecoveryPass->close();
+        lineRecoveryPass->clear();
+        lineRecoveryConfirmPass->clear();
+        labelPass->show();
+        labelSuccess->show();
+
+        connect(animations[0], SIGNAL(finished()), lineRecoveryConfirmPass, SLOT(close()));
+        animations[0]->start(QAbstractAnimation::DeleteWhenStopped);
+        animations[1]->start(QAbstractAnimation::DeleteWhenStopped);
+        animations[2]->start(QAbstractAnimation::DeleteWhenStopped);
+        animations[3]->start(QAbstractAnimation::DeleteWhenStopped);
+        animations[4]->start(QAbstractAnimation::DeleteWhenStopped);
+
+        timerLabelSuccess->start();
+    }
+    else if(value == "Password hasn't been changed"){
+        //TODO
     }
 }
 
@@ -800,7 +807,7 @@ void AuthWindow::recoveryEmailSend(){
     request.insert("Target", "Recovery");
     request.insert("Value", lineLog->text());
 
-    socket->write(QJsonDocument(request).toJson());
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 void AuthWindow::recoveryCodeSend(){
@@ -809,7 +816,7 @@ void AuthWindow::recoveryCodeSend(){
     request.insert("Value", lineLog->text());
     request.insert("Code", lineConfirmCode->text());
 
-    socket->write(QJsonDocument(request).toJson());
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 void AuthWindow::recoveryNewPassSend(){
@@ -818,7 +825,7 @@ void AuthWindow::recoveryNewPassSend(){
     request.insert("Value", lineLog->text());
     request.insert("Password", lineRecoveryPass->text());
 
-    socket->write(QJsonDocument(request).toJson());
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 
@@ -1587,7 +1594,7 @@ void AuthWindow::checkingNickname(){
         request.insert("Target", "DoesNicknameExist");
         request.insert("Nickname", lineLog->text());
 
-        socket->write(QJsonDocument(request).toJson());
+        TCPClient::getInstance().send(QJsonDocument(request).toJson());
     }
 }
 
@@ -1937,8 +1944,6 @@ void AuthWindow::setPassEnabled(){
 
 AuthWindow::~AuthWindow(){
     delete ui;
-
-    socket->close();
 
     delete lineLog;
     delete linePass;

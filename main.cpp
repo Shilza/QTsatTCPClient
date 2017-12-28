@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     AuthWindow *authWindow=new AuthWindow;
     authWindow->show();
 
-    QObject::connect(authWindow, SIGNAL(startMainWindow(QTcpSocket*)), mainWindow, SLOT(start(QTcpSocket*)));
+    QObject::connect(authWindow, SIGNAL(startMainWindow()), mainWindow, SLOT(start()));
 
     return a.exec();
 }

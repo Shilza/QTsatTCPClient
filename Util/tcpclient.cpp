@@ -1,10 +1,18 @@
 #include "tcpclient.h"
 
-TCPClient::TCPClient(QTcpSocket *socket, QObject *parent) : QObject(parent){
+TCPClient::TCPClient(QObject *parent) : QObject(parent){
 
-    this->socket = socket;
+    socket = new QTcpSocket(this);
 
-    connect(this->socket, SIGNAL(readyRead()), this, SLOT(reading()));
+    host.setAddress(HOST_IP);
+    socket->connectToHost(QHostAddress::LocalHost, 40000);
+
+    connect(socket, SIGNAL(readyRead()), this, SLOT(reading()));
+}
+
+TCPClient &TCPClient::getInstance(){
+    static TCPClient instance;
+    return instance;
 }
 
 void TCPClient::sendMessage(QString msg){
@@ -13,7 +21,11 @@ void TCPClient::sendMessage(QString msg){
     request.insert("Target", "GMessage");
     request.insert("Message", msg);
 
-    socket->write(QJsonDocument(request).toJson());
+    send(QJsonDocument(request).toJson());
+}
+
+void TCPClient::send(QByteArray request){
+    socket->write(request);
 }
 
 void TCPClient::reading(){
@@ -21,9 +33,31 @@ void TCPClient::reading(){
     QJsonParseError error;
 
     QJsonObject response = QJsonDocument::fromJson(receivedObject, &error).object();
+    qDebug() << receivedObject;
 
     if(error.error == QJsonParseError::NoError){
-        if(response.value("Target")=="Message delivery"){
+        if(response.value("Target").toString() == "Authorization"){
+            emit authorization(response.value("Value").toString());
+        }
+        else if(response.value("Target").toString() == "DoesNicknameExist"){
+            emit nicknameExisting(response.value("Value").toString());
+        }
+        else if(response.value("Target").toString() == "Registration"){
+            emit registration(response.value("Value").toString());
+        }
+        else if(response.value("Target").toString() == "Registration code"){
+            emit registrationCode(response.value("Value").toString());
+        }
+        else if(response.value("Target").toString() == "Recovery"){
+            emit recovery(response.value("Value").toString());
+        }
+        else if(response.value("Target").toString() == "Recovery code"){
+            emit recoveryCode(response.value("Value").toString());
+        }
+        else if(response.value("Target").toString() == "Recovery new pass"){
+            emit recoveryNewPass(response.value("Value").toString());
+        }
+        else if(response.value("Target")=="Message delivery"){
             qDebug() << "sdf";
         }
     }

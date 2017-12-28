@@ -116,15 +116,14 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 }
 
-void MainWindow::start(QTcpSocket *socket){
-    client = new TCPClient(socket, this);
+void MainWindow::start(){
     show();
 }
 
 void MainWindow::sendMessage(QString message){
 
     if(message!="")
-        client->sendMessage(message);
+        TCPClient::getInstance().sendMessage(message);
 
 }
 
@@ -171,7 +170,6 @@ void MainWindow::printMessages(){
 
 MainWindow::~MainWindow(){
     delete ui;
-    delete client;
 
     delete globalChatWidget;
     delete globalChatLayout;
