@@ -61,4 +61,5 @@ ImageView::~ImageView(){
     delete picture;
     delete buttonClose;
     delete mainLayout;
+    delete background;
 }

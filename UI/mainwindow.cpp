@@ -171,9 +171,22 @@ void MainWindow::printMessages(){
 MainWindow::~MainWindow(){
     delete ui;
 
+    delete imageView;
+    delete stackOfWidgets;
+    delete mainWidget;
+    delete mainLayout;
+    delete menuListWidget;
+    delete menuListLayout;
+
+    delete sendWidget;
+    delete affixImageWidget;
+
+    delete listOfGlobalMessages;
     delete globalChatWidget;
     delete globalChatLayout;
     delete listOfGlobalMessages;
+
+    delete buttonUserPage;
     delete buttonPrivateMessages;
     delete buttonFriends;
 }

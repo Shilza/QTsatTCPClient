@@ -263,6 +263,8 @@ SendWidget::~SendWidget(){
     delete buttonVideos;
     delete buttonAudios;
     delete buttonDocuments;
+
+    delete floodTimer;
 }
 
 QWidget *SendWidget::getMainWidget(){
