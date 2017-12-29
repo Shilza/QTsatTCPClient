@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -114,6 +115,9 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(sendWidget, SIGNAL(imageReceived(QPixmap)), affixImageWidget, SLOT(receivedImageTreatment(QPixmap)));
     connect(affixImageWidget, SIGNAL(originalSizeReleased(QPixmap)), imageView, SLOT(setPicture(QPixmap)));
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
+
+    connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), sendWidget, SLOT(messageSended()));
+    connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
 }
 
 void MainWindow::start(){
@@ -127,7 +131,7 @@ void MainWindow::sendMessage(QString message){
 
 }
 
-void MainWindow::printMessages(){
+void MainWindow::printMessages(QString nickname, QString message, int time){
     QWidget *widget = new QWidget(listOfGlobalMessages);
     QGridLayout *layout = new QGridLayout(widget);
     layout->setContentsMargins(2,5,5,5);
@@ -136,8 +140,8 @@ void MainWindow::printMessages(){
     layout->setVerticalSpacing(5);
     widget->setLayout(layout);
 
-    QLabel *nickname = new QLabel("Sosik", widget);
-    QLabel *timeOfMessage = new QLabel("22:45:11", widget);
+    QLabel *labelNickname = new QLabel(nickname, widget);
+    QLabel *timeOfMessage = new QLabel(QDateTime::fromTime_t(time).time().toString(), widget);
     //The purpose of this slot is to select a random line from our list of fortunes, encode it into a QByteArray using QDataStream, and then write it to the connecting socket. This is a common way to transfer binary data using QTcpSocket. First we create a QByteArray and a QDataStream object, passing the bytearray to QDataStream's constructor. We then explicitly set the protocol version of QDataStream to QDataStream::Qt_4_0 to ensure that we can communicate with clients from future versions of Qt (see QDataStream::setVersion()). We continue by streaming in a random fortune.
     WrapLabel *textOfMessage = new WrapLabel(widget);
     QLabel *button = new QLabel("Sas", widget);
@@ -145,7 +149,7 @@ void MainWindow::printMessages(){
     button->setStyleSheet("background: black;");
     button->setFixedSize(30,30);
 
-    nickname->setFixedHeight(10);
+    labelNickname->setFixedHeight(10);
     timeOfMessage->setFixedHeight(10);
 
     textOfMessage->setFixedWidth(450);
@@ -153,9 +157,9 @@ void MainWindow::printMessages(){
     textOfMessage->setStyleSheet("border: 0px;"
                                  "background:transparent;");
     textOfMessage->setTextInteractionFlags(textOfMessage->textInteractionFlags() | Qt::TextSelectableByMouse);
-    textOfMessage->wrapText(sendWidget->getTextMessage()->toPlainText()); //temporary
+    textOfMessage->wrapText(message);
 
-    layout->addWidget(nickname, 0, 1, 1, 1);
+    layout->addWidget(labelNickname, 0, 1, 1, 1);
     layout->addWidget(timeOfMessage, 0, 7, 1, 1, Qt::AlignRight);
     layout->addWidget(textOfMessage, 1, 1, 2, 7, Qt::AlignLeft | Qt::AlignTop);
 

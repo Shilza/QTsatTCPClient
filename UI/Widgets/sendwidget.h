@@ -44,9 +44,11 @@ private:
     quint8 countOfAttachment=0;
 
     bool eventFilter(QObject *target, QEvent *event);
+
 signals:
     void messageSended(QString);
     void imageReceived(QPixmap);
+
 private slots:
     void floodErrorHide();
     void updateTime();
@@ -54,6 +56,8 @@ private slots:
     void send();
     void imageReceivedRedirect(QPixmap);
     void selectImage();
+    void messageSended();
+
 public slots:
     void decrementing();
 };

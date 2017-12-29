@@ -60,6 +60,10 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     buttonEye->installEventFilter(this);
     lineRecoveryPass->installEventFilter(this);
     buttonRecoveryEye->installEventFilter(this);
+    lineEmail->installEventFilter(this);
+    lineConfirmPass->installEventFilter(this);
+    lineRecoveryConfirmPass->installEventFilter(this);
+    lineConfirmCode->installEventFilter(this);
 
     buttonEye->setCursor(Qt::ArrowCursor);
     buttonRecoveryEye->setCursor(Qt::ArrowCursor);
@@ -589,6 +593,8 @@ void AuthWindow::recoveryReceived(QString value){
         animations[3]->setDuration(DURATION);
         animations[3]->setEndValue(QPoint(labelSignUp->x(), defaultY+(2*lineHWithSpace)+buttonHWithSpace));
         animations[3]->start(QAbstractAnimation::DeleteWhenStopped);
+
+        lineConfirmCode->setFocus();
     }
     else if(value == "Not founded"){
         labelError->setText("Nickname or email not found");
@@ -646,6 +652,8 @@ void AuthWindow::recoveryCodeReceived(QString value){
             animations[i]->setDuration(DURATION);
             animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
         }
+
+        lineRecoveryPass->setFocus();
     }
     else if(value == "Invalid code"){
         labelError->setText("Invalid confirmation code");
@@ -996,10 +1004,13 @@ void AuthWindow::cancelPreloading(){
         animations[1]->setEndValue(1);
         animations[1]->start(QAbstractAnimation::DeleteWhenStopped);
 
+
         lineEmail->setEnabledOverride();
         lineLog->setEnabledOverride();
         setPassEnabled();
         lineConfirmPass->setEnabledOverride();
+        if(labelError->text() == "Email already exists")
+            lineEmail->setFocus();
     }
     else if(location==LOC_REGISTRATION_CODE){
         lineConfirmCode->setEnabledOverride();
@@ -1188,6 +1199,7 @@ void AuthWindow::gotoRecoveryLoc(){
     lineConfirmCode->clear();
     opacity->setOpacity(1.0);
     location=LOC_RECOVERY_EMAIL;
+    lineLog->setFocus();
     isRecoveryPassEmpty=false;
 
     lineLog->setDefaultStyleSheet();
@@ -1240,6 +1252,7 @@ void AuthWindow::gotoSignUpLoc(){
     lineLog->setEnabledOverride();
     lineEmail->setEnabledOverride();
     lineConfirmPass->setEnabledOverride();
+    lineEmail->setFocus();
     isPassEmpty=false;
 
     lineLog->setPlaceholderText("Nickname");
@@ -1410,6 +1423,7 @@ void AuthWindow::gotoSignInLoc(){
     lineEmail->clear();
     lineConfirmPass->clear();
     lineLog->setEnabledOverride();
+    lineLog->setFocus();
     isPassEmpty=false;
     setPassEnabled();
 
@@ -1800,7 +1814,53 @@ bool AuthWindow::eventFilter(QObject *target, QEvent *event){
 
         }
     }
-    else if((target == linePass || target==buttonEye) && labelPass->isEnabled() && !isPassEmpty){
+
+    if(target == lineEmail && event->type() == QEvent::KeyPress){
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Return || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Enter || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Down)
+            lineLog->setFocus();
+    }
+    else if(target == lineLog && event->type() == QEvent::KeyPress){
+        if (static_cast<QKeyEvent*>(event)->key() == Qt::Key_Return || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Enter || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Down){
+            if(location != LOC_RECOVERY_EMAIL)
+                linePass->setFocus();
+            else
+                buttonOk_released();
+        }
+        else if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Up && location == LOC_REGISTRATION)
+            lineEmail->setFocus();
+    }
+    else if(target == linePass && event->type() == QEvent::KeyPress){
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Return || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Enter || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Down){
+            if(location == LOC_REGISTRATION)
+                lineConfirmPass->setFocus();
+            else
+                signIn_released();
+        }
+        else if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Up)
+            lineLog->setFocus();
+    }
+    else if(target == lineConfirmPass && event->type() == QEvent::KeyPress){
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Return || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Enter)
+            signUp_released();
+        else if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Up)
+            linePass->setFocus();
+    }
+    else if(target == lineRecoveryPass && event->type() == QEvent::KeyPress){
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Return || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Enter || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Down)
+            lineRecoveryConfirmPass->setFocus();
+    }
+    else if(target == lineRecoveryConfirmPass && event->type() == QEvent::KeyPress){
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Return || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Enter)
+            buttonOk_released();
+        else if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Up)
+            lineRecoveryPass->setFocus();
+    }
+    else if(target == lineConfirmCode && event->type() == QEvent::KeyPress){
+        if(static_cast<QKeyEvent*>(event)->key() == Qt::Key_Return || static_cast<QKeyEvent*>(event)->key() == Qt::Key_Enter)
+            buttonOk_released();
+    }
+
+    if((target == linePass || target==buttonEye) && labelPass->isEnabled() && !isPassEmpty){
         if(event->type()==QEvent::HoverEnter){
             if(!linePass->hasFocus()){
                 linePass->setStyleSheet(QString("AuthLineEdit{"

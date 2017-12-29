@@ -30,35 +30,38 @@ void TCPClient::send(QByteArray request){
 
 void TCPClient::reading(){
     QByteArray receivedObject = socket->readAll();
+
     QJsonParseError error;
 
     QJsonObject response = QJsonDocument::fromJson(receivedObject, &error).object();
-    qDebug() << receivedObject;
 
     if(error.error == QJsonParseError::NoError){
-        if(response.value("Target").toString() == "Authorization"){
+        if(response.value("Target").toString() == "Authorization")
             emit authorization(response.value("Value").toString());
-        }
-        else if(response.value("Target").toString() == "DoesNicknameExist"){
+        else if(response.value("Target").toString() == "DoesNicknameExist")
             emit nicknameExisting(response.value("Value").toString());
-        }
-        else if(response.value("Target").toString() == "Registration"){
+        else if(response.value("Target").toString() == "Registration")
             emit registration(response.value("Value").toString());
-        }
-        else if(response.value("Target").toString() == "Registration code"){
+        else if(response.value("Target").toString() == "Registration code")
             emit registrationCode(response.value("Value").toString());
-        }
-        else if(response.value("Target").toString() == "Recovery"){
+        else if(response.value("Target").toString() == "Recovery")
             emit recovery(response.value("Value").toString());
-        }
-        else if(response.value("Target").toString() == "Recovery code"){
+        else if(response.value("Target").toString() == "Recovery code")
             emit recoveryCode(response.value("Value").toString());
-        }
-        else if(response.value("Target").toString() == "Recovery new pass"){
+        else if(response.value("Target").toString() == "Recovery new pass")
             emit recoveryNewPass(response.value("Value").toString());
+        else if(response.value("Target").toString() == "Message status"){
+            if(!response.contains("Value"))
+                emit messageSended();
+            else if(response.value("Value").toString() == "Message not delivered"){
+
+            }
+            else if(response.value("Value").toString() == "Ban"){
+
+            }
         }
-        else if(response.value("Target")=="Message delivery"){
-            qDebug() << "sdf";
+        else if(response.value("Target").toString() == "Message delivery"){
+            emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt());
         }
     }
 

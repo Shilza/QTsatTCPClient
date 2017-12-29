@@ -241,6 +241,10 @@ void SendWidget::selectImage(){
 
 }
 
+void SendWidget::messageSended(){
+    textMessage->clear();
+}
+
 void SendWidget::decrementing(){
     countOfAttachment--;
 }

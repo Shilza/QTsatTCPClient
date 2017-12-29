@@ -51,9 +51,11 @@ private:
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
 private slots:
     void sendMessage(QString);
-    void printMessages();
+    void printMessages(QString, QString, int);
+
 public slots:
     void start();
 };

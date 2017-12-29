@@ -36,6 +36,8 @@ signals:
     void recovery(QString);
     void recoveryCode(QString);
     void recoveryNewPass(QString);
+    void messageSended();
+    void messageReceived(QString, QString, int);
 
 private slots:
     void reading();
