@@ -6,6 +6,9 @@
 #include <QScrollBar>
 #include <QFileDialog>
 #include <QPropertyAnimation>
+#include <QDateTime>
+#include <QLocale>
+#include "Util/tcpclient.h"
 #include "Util/floodtimer.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "UI/Widgets/globaltextedit.h"
@@ -18,6 +21,8 @@ public:
     QWidget *getMainWidget();
     GlobalTextEdit *getTextMessage();
     ~SendWidget();
+    void ban(uint);
+
 private:
     QWidget *mainWidget;
     QPushButton *affixWidgetContainer;
@@ -40,8 +45,10 @@ private:
     QPushButton *buttonDocuments;
 
     FloodTimer *floodTimer;
+    QTimer *banTimer;
 
     quint8 countOfAttachment=0;
+    uint banFinish = 0;
 
     bool eventFilter(QObject *target, QEvent *event);
 
@@ -57,6 +64,9 @@ private slots:
     void imageReceivedRedirect(QPixmap);
     void selectImage();
     void messageSended();
+    void floodReceived(int);
+    void banFinished();
+    void banFinishing(bool);
 
 public slots:
     void decrementing();

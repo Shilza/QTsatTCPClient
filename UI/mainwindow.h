@@ -57,7 +57,7 @@ private slots:
     void printMessages(QString, QString, int);
 
 public slots:
-    void start();
+    void start(uint);
 };
 
 #endif // MAINWINDOW_H

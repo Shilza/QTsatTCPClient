@@ -1,4 +1,5 @@
 #include "sendwidget.h"
+#include <QDebug>
 
 SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     mainWidget = new QWidget(this);
@@ -26,6 +27,9 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     labelTimerShow = new QLabel(textMessage);
     labelSymbolsCount = new QLabel(textMessage);
 
+    banTimer = new QTimer(this);
+    banTimer->setSingleShot(true);
+
     subAffixWidget->setStyleSheet("background: transparent;"
                                   "border: 0px;");
 
@@ -34,8 +38,8 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
 
     mainWidget->setLayout(sendLayout);
     mainWidget->setStyleSheet("background: #E5F0F0;"
-                        "border: 1px solid gray;"
-                        "border-top: 0px;");
+                              "border: 1px solid gray;"
+                              "border-top: 0px;");
 
     affixWidgetContainer->setLayout(affixLayout);
     affixWidgetContainer->setMaximumHeight(100);
@@ -181,13 +185,21 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     buttonAudios->installEventFilter(this);
     buttonDocuments->installEventFilter(this);
 
-    connect(buttonSend, SIGNAL(released()), this, SLOT(send()));
-    connect(textMessage, SIGNAL(enter()),this, SLOT(send()));
-    connect(textMessage, SIGNAL(textChanged()), this, SLOT(showSymbolsCount()));
-    connect(floodTimer, SIGNAL(errorTimeout()), this, SLOT(floodErrorHide()));
-    connect(floodTimer, SIGNAL(showTimeout()), this, SLOT(updateTime()));
-    connect(textMessage, SIGNAL(imageReceived(QPixmap)), this, SLOT(imageReceivedRedirect(QPixmap)));
-    connect(buttonPhotos, SIGNAL(released()), this, SLOT(selectImage()));
+
+
+    connect(buttonSend, SIGNAL(released()), SLOT(send()));
+    connect(textMessage, SIGNAL(enter()), SLOT(send()));
+    connect(textMessage, SIGNAL(textChanged()), SLOT(showSymbolsCount()));
+    connect(floodTimer, SIGNAL(errorTimeout()), SLOT(floodErrorHide()));
+    connect(floodTimer, SIGNAL(showTimeout()), SLOT(updateTime()));
+    connect(textMessage, SIGNAL(imageReceived(QPixmap)), SLOT(imageReceivedRedirect(QPixmap)));
+    connect(buttonPhotos, SIGNAL(released()), SLOT(selectImage()));
+
+    connect(&(TCPClient::getInstance()), SIGNAL(flood(int)), SLOT(floodReceived(int)));
+    connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(messageSended()));
+    connect(&(TCPClient::getInstance()), SIGNAL(banFinished(bool)), SLOT(banFinishing(bool)));
+
+    connect(banTimer, SIGNAL(timeout()), SLOT(banFinished()));
 }
 
 void SendWidget::floodErrorHide(){
@@ -245,6 +257,31 @@ void SendWidget::messageSended(){
     textMessage->clear();
 }
 
+void SendWidget::floodReceived(int time){
+    labelFloodError->show();
+    labelTimerShow->show();
+    textMessage->setDisabled(true);
+    floodTimer->start(time);
+}
+
+void SendWidget::banFinished(){
+    QJsonObject request;
+    request.insert("Target", "Ban finished");
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
+}
+
+void SendWidget::banFinishing(bool isFinished){
+    banTimer->stop();
+
+    if(isFinished){
+        labelBan->close();
+        buttonSend->setEnabled(true);
+        textMessage->setEnabled(true);
+    }
+    else
+        banTimer->start(300000);
+}
+
 void SendWidget::decrementing(){
     countOfAttachment--;
 }
@@ -269,6 +306,15 @@ SendWidget::~SendWidget(){
     delete buttonDocuments;
 
     delete floodTimer;
+}
+
+void SendWidget::ban(uint time){
+    QLocale locale = QLocale(QLocale::English);
+    banTimer->start((time-QDateTime::currentDateTime().toTime_t())*1000);
+    labelBan->setText("Ban until " + locale.toString(QDateTime::fromTime_t(time), "d MMM yy hh:mm:ss"));
+    labelBan->show();
+    textMessage->setDisabled(true);
+    buttonSend->setDisabled(true);
 }
 
 QWidget *SendWidget::getMainWidget(){

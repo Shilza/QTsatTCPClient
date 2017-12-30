@@ -105,7 +105,7 @@ public:
     ~AuthWindow();
 
 signals:
-    void startMainWindow();
+    void startMainWindow(uint);
     void loadingWasStart();
     void errorHasOccured();
 
@@ -144,7 +144,7 @@ private slots:
     void errorHide();
     void labelSuccessHide();
 
-    void authorizationReceived(QString);
+    void authorizationReceived(QString, uint);
     void nicknameExisting(QString);
     void registrationReceived(QString);
     void registrationCodeReceived(QString);

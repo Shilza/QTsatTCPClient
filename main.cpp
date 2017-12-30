@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     AuthWindow *authWindow=new AuthWindow;
     authWindow->show();
 
-    QObject::connect(authWindow, SIGNAL(startMainWindow()), mainWindow, SLOT(start()));
+    QObject::connect(authWindow, SIGNAL(startMainWindow(uint)), mainWindow, SLOT(start(uint)));
 
     return a.exec();
 }

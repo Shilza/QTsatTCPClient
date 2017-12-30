@@ -116,19 +116,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(affixImageWidget, SIGNAL(originalSizeReleased(QPixmap)), imageView, SLOT(setPicture(QPixmap)));
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 
-    connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), sendWidget, SLOT(messageSended()));
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
 }
 
-void MainWindow::start(){
+void MainWindow::start(uint time){
+    if(time)
+        sendWidget->ban(time);
+
     show();
 }
 
 void MainWindow::sendMessage(QString message){
-
     if(message!="")
         TCPClient::getInstance().sendMessage(message);
-
 }
 
 void MainWindow::printMessages(QString nickname, QString message, int time){

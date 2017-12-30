@@ -29,7 +29,7 @@ public:
 
 signals:
     void updating();
-    void authorization(QString);
+    void authorization(QString, uint);
     void nicknameExisting(QString);
     void registration(QString);
     void registrationCode(QString);
@@ -38,6 +38,8 @@ signals:
     void recoveryNewPass(QString);
     void messageSended();
     void messageReceived(QString, QString, int);
+    void flood(int);
+    void banFinished(bool);
 
 private slots:
     void reading();

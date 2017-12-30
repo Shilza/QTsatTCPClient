@@ -37,7 +37,8 @@ void TCPClient::reading(){
 
     if(error.error == QJsonParseError::NoError){
         if(response.value("Target").toString() == "Authorization")
-            emit authorization(response.value("Value").toString());
+            emit authorization(response.value("Value").toString(),
+                               response.contains("Ban") ? response.value("Ban").toInt() : 0);
         else if(response.value("Target").toString() == "DoesNicknameExist")
             emit nicknameExisting(response.value("Value").toString());
         else if(response.value("Target").toString() == "Registration")
@@ -53,16 +54,18 @@ void TCPClient::reading(){
         else if(response.value("Target").toString() == "Message status"){
             if(!response.contains("Value"))
                 emit messageSended();
-            else if(response.value("Value").toString() == "Message not delivered"){
-
+            else if(response.value("Value").toString() == "Flood"){
+                emit flood(response.value("Time").toInt());
             }
             else if(response.value("Value").toString() == "Ban"){
-
+                qDebug() << "Ban";
             }
         }
         else if(response.value("Target").toString() == "Message delivery"){
             emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt());
         }
+        else if(response.value("Target").toString() == "Ban finished")
+            emit banFinished(response.value("Value") == "True");
     }
 
     /*buffer.resize(socket->pendingDatagramSize());

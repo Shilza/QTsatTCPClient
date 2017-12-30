@@ -286,7 +286,7 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     connect(timerLabelSuccess, SIGNAL(timeout()), this, SLOT(labelSuccessHide()));
     connect(timerErrorLabel, SIGNAL(timeout()), this, SLOT(errorHide()));
 
-    connect(&(TCPClient::getInstance()), SIGNAL(authorization(QString)), SLOT(authorizationReceived(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(authorization(QString, uint)), SLOT(authorizationReceived(QString, uint)));
     connect(&(TCPClient::getInstance()), SIGNAL(registration(QString)), SLOT(registrationReceived(QString)));
     connect(&(TCPClient::getInstance()), SIGNAL(registrationCode(QString)), SLOT(registrationCodeReceived(QString)));
     connect(&(TCPClient::getInstance()), SIGNAL(recovery(QString)), SLOT(recoveryReceived(QString)));
@@ -319,7 +319,6 @@ void AuthWindow::signIn_released(){
     }
 
     if(!isLineEmpty){
-
         if(!isOnline()){
             labelError->setText("No Internet access");
             emit errorHasOccured();
@@ -445,14 +444,14 @@ void AuthWindow::labelSuccessHide(){
 }
 
 
-void AuthWindow::authorizationReceived(QString value){
+void AuthWindow::authorizationReceived(QString value, uint time){
     timerWaitingAnswer->stop();
     if(value == "Authorization failed"){
         labelError->setText("Invalid password or nickname");
         emit errorHasOccured();
     }
     else if(value == "Authorization successful"){
-        emit startMainWindow();
+        emit startMainWindow(time);
         close();
     }
 }
@@ -621,17 +620,18 @@ void AuthWindow::recoveryCodeReceived(QString value){
         lineRecoveryPass->setEnabled(true);
         buttonRecoveryEye->setEnabled(true);
         lineRecoveryPass->setStyleSheet(QString("AuthLineEdit{"
-                                                "font-family: Century Gothic;"
-                                                "font-size: %1px;"
-                                                "background: transparent;"
-                                                "border: 1px solid gray;"
-                                                "border-right: 0px;"
-                                                "color: #B5EBEE;"
-                                                "}").arg(defaultFontSize));
+                                                        "font-family: Century Gothic;"
+                                                        "font-size: %1px;"
+                                                        "background: transparent;"
+                                                        "border: 1px solid #0078d7;"
+                                                        "border-right: 0px;"
+                                                        "color: #B5EBEE;"
+                                                        "}").arg(defaultFontSize));
+        lineRecoveryPass->setFocus();
         buttonRecoveryEye->setStyleSheet("QPushButton{"
                                          "background: transparent;"
-                                         "border: 1px solid gray;"
-                                         "border-left: 0px solid gray;"
+                                         "border: 1px solid #0078d7;"
+                                         "border-left: 0px;"
                                          "}");
         lineRecoveryConfirmPass->setEnabledOverride();
 
@@ -652,8 +652,6 @@ void AuthWindow::recoveryCodeReceived(QString value){
             animations[i]->setDuration(DURATION);
             animations[i]->start(QAbstractAnimation::DeleteWhenStopped);
         }
-
-        lineRecoveryPass->setFocus();
     }
     else if(value == "Invalid code"){
         labelError->setText("Invalid confirmation code");
@@ -725,8 +723,6 @@ void AuthWindow::buttonOk_released(){
             lineLog->setErrorStyleSheet();
         }
         else{
-
-
             if(!isOnline()){
                 labelError->setText("No Internet access");
                 emit errorHasOccured();
@@ -837,8 +833,7 @@ void AuthWindow::recoveryNewPassSend(){
 }
 
 
-void AuthWindow::startPreloading()
-{
+void AuthWindow::startPreloading(){
     if(location == LOC_SIGNIN){
         buttonSignIn->setGraphicsEffect(opacity);
 
@@ -1097,7 +1092,7 @@ void AuthWindow::cancelPreloading(){
         buttonRecoveryEye->setStyleSheet("QPushButton{"
                                          "background: transparent;"
                                          "border: 1px solid gray;"
-                                         "border-left: 0px solid gray;"
+                                         "border-left: 0px;"
                                          "}");
 
 
@@ -1119,7 +1114,6 @@ void AuthWindow::cancelPreloading(){
         animations[0]->start(QAbstractAnimation::DeleteWhenStopped);
         animations[1]->start(QAbstractAnimation::DeleteWhenStopped);
         animations[2]->start(QAbstractAnimation::DeleteWhenStopped);
-
     }
 
     labelErrorBackground->show();
@@ -1132,6 +1126,7 @@ void AuthWindow::cancelPreloading(){
 
 
 void AuthWindow::changingPassEchoMode(){
+    linePass->setFocus();
     if(linePass->echoMode()==QLineEdit::Password){
         linePass->setEchoMode(QLineEdit::Normal);
         lineConfirmPass->setEchoMode(QLineEdit::Normal);
@@ -1143,6 +1138,7 @@ void AuthWindow::changingPassEchoMode(){
 }
 
 void AuthWindow::changingRecoveryPassEchoMode(){
+    lineConfirmPass->setFocus();
     if(lineRecoveryPass->echoMode()==QLineEdit::Password){
         lineRecoveryPass->setEchoMode(QLineEdit::Normal);
         lineRecoveryConfirmPass->setEchoMode(QLineEdit::Normal);
@@ -1177,13 +1173,13 @@ void AuthWindow::changingRecoveryPassBorder(){
                                             "font-family: Century Gothic;"
                                             "font-size: %1px;"
                                             "background: transparent;"
-                                            "border: 1px solid gray;"
+                                            "border: 1px solid #0078d7;"
                                             "border-right: 0px;"
                                             "color: #B5EBEE;"
                                             "}").arg(defaultFontSize));
     buttonRecoveryEye->setStyleSheet("QPushButton{"
                                      "background: transparent;"
-                                     "border: 1px solid gray;"
+                                     "border: 1px solid #0078d7;"
                                      "border-left: 0px;"
                                      "}");
 }
@@ -1214,7 +1210,7 @@ void AuthWindow::gotoRecoveryLoc(){
     buttonEye->setStyleSheet("QPushButton{"
                              "background: transparent;"
                              "border: 1px solid gray;"
-                             "border-left: 0px solid gray;"
+                             "border-left: 0px;"
                              "}");
 
     QPropertyAnimation *animations[5];
@@ -1378,7 +1374,7 @@ void AuthWindow::gotoSignUpLoc(){
         buttonEye->setStyleSheet("QPushButton{"
                                  "background: transparent;"
                                  "border: 1px solid gray;"
-                                 "border-left: 0px solid gray;"
+                                 "border-left: 0px;"
                                  "}");
 
         QPropertyAnimation *localAnimations[6];
@@ -1632,7 +1628,6 @@ void AuthWindow::checkingRecoveryConfirming(QString){
 
 
 void AuthWindow::waitingAnswer(){
-    //CHECK
     labelError->setText("Server is not available");
     emit errorHasOccured();
 }
@@ -1997,7 +1992,7 @@ void AuthWindow::setPassEnabled(){
                                     "color: #B5EBEE;"
                                     "}").arg(defaultFontSize));
     buttonEye->setStyleSheet("QPushButton{"
-                             "background: transparent; border: 1px solid gray; border-left: 0px solid gray;"
+                             "background: transparent; border: 1px solid gray; border-left: 0px;"
                              "}");
 }
 

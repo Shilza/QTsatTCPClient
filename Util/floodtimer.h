@@ -8,16 +8,17 @@ class FloodTimer : public QObject{
 public:
     explicit FloodTimer(QWidget *parent=0);
     ~FloodTimer();
-    quint8 getCounter();
     int remainingTime();
-    void start();
+    void start(int time);
+
 private:
     QTimer *timerErrorHide;
     QTimer *timerShow;
-    quint8 counter;
+
 signals:
     void errorTimeout();
     void showTimeout();
+
 private slots:
     void emitErrorTimeout();
     void emitShowTimeout();
