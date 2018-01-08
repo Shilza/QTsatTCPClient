@@ -42,7 +42,9 @@ SOURCES += \
     UI/Widgets/affiximagewidget.cpp \
     UI/Widgets/sendwidget.cpp \
     UI/Widgets/imageview.cpp \
-    Util/tcpclient.cpp
+    Util/tcpclient.cpp \
+    UI/Widgets/menulist.cpp \
+    UI/Widgets/presettings.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -57,7 +59,9 @@ HEADERS += \
     UI/Widgets/affiximagewidget.h \
     UI/Widgets/sendwidget.h \
     UI/Widgets/imageview.h \
-    Util/tcpclient.h
+    Util/tcpclient.h \
+    UI/Widgets/menulist.h \
+    UI/Widgets/presettings.h
 
 FORMS += \
         UI/mainwindow.ui \

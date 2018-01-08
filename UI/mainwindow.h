@@ -17,6 +17,7 @@
 #include "UI/Widgets/privatetextedit.h"
 #include "UI/Widgets/wraplabel.h"
 #include "Util/tcpclient.h"
+#include "UI/Widgets/menulist.h"
 
 namespace Ui {
 class MainWindow;
@@ -34,17 +35,13 @@ private:
     QHBoxLayout *mainLayout;
     QWidget *globalChatWidget;
     QGridLayout *globalChatLayout;
-    QWidget *menuListWidget;
-    QVBoxLayout *menuListLayout;
+    MenuList *menuListWidget;
+
 
     SendWidget *sendWidget;
     AffixImageWidget *affixImageWidget;
 
     QListWidget *listOfGlobalMessages;
-
-    QPushButton *buttonUserPage;
-    QPushButton *buttonPrivateMessages;
-    QPushButton *buttonFriends;
 
     ImageView *imageView;
 

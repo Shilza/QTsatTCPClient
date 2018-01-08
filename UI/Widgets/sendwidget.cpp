@@ -1,4 +1,5 @@
 #include "sendwidget.h"
+#include "Config/def.h"
 #include <QDebug>
 
 SendWidget::SendWidget(QWidget *parent): QWidget(parent){
@@ -26,6 +27,7 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
 
     labelTimerShow = new QLabel(textMessage);
     labelSymbolsCount = new QLabel(textMessage);
+
 
     banTimer = new QTimer(this);
     banTimer->setSingleShot(true);
@@ -198,6 +200,7 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(flood(int)), SLOT(floodReceived(int)));
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(messageSended()));
     connect(&(TCPClient::getInstance()), SIGNAL(banFinished(bool)), SLOT(banFinishing(bool)));
+    connect(&(TCPClient::getInstance()), SIGNAL(banStarted(uint)), SLOT(ban(uint)));
 
     connect(banTimer, SIGNAL(timeout()), SLOT(banFinished()));
 }
@@ -309,6 +312,7 @@ SendWidget::~SendWidget(){
 }
 
 void SendWidget::ban(uint time){
+    textMessage->clear();
     QLocale locale = QLocale(QLocale::English);
     banTimer->start((time-QDateTime::currentDateTime().toTime_t())*1000);
     labelBan->setText("Ban until " + locale.toString(QDateTime::fromTime_t(time), "d MMM yy hh:mm:ss"));

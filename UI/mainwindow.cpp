@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "Config/def.h"
 #include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -7,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    resize(660,444);
+    resize(MAINWINDOW_WIDTH, MAINWINDOW_HEIGHT);
 
     mainWidget = new QWidget(this);
     mainLayout = new QHBoxLayout(mainWidget);
@@ -17,14 +18,9 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChatWidget = new QWidget(stackOfWidgets);
     globalChatLayout = new QGridLayout(globalChatWidget);
 
-    menuListWidget = new QWidget(mainWidget);
-    menuListLayout = new QVBoxLayout(menuListWidget);
+    menuListWidget = new MenuList(mainWidget);
 
     listOfGlobalMessages = new QListWidget(globalChatWidget);
-
-    buttonUserPage = new QPushButton(menuListWidget);
-    buttonPrivateMessages = new QPushButton(menuListWidget);
-    buttonFriends = new QPushButton(menuListWidget);
 
     affixImageWidget = new AffixImageWidget(globalChatWidget);
 
@@ -34,12 +30,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(mainWidget);
 
-    menuListWidget->setLayout(menuListLayout);
+    menuListWidget->setFixedHeight(height() - contentsMargins().top() - contentsMargins().bottom() - 2);
+
     mainWidget->setLayout(mainLayout);
     mainLayout->setMargin(2);
     mainLayout->setSpacing(0);
     mainLayout->addWidget(stackOfWidgets, 6);
-    mainLayout->addWidget(menuListWidget, 1);
+    mainLayout->addWidget(menuListWidget, 1, Qt::AlignTop);
 
     listOfGlobalMessages->setMinimumSize(300, 250);
     listOfGlobalMessages->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -71,26 +68,6 @@ MainWindow::MainWindow(QWidget *parent) :
                                                              "subcontrol-origin: margin;"
                                                              "}");
 
-    QString buttonDefaultStyle = "QPushButton{"
-                                 "background: transparent;"
-                                 "border: 0px;"
-                                 "}"
-                                 "QPushButton:hover{"
-                                 "background: #D3E9E9;"
-                                 "}";
-
-    buttonUserPage->setFixedSize(50, 50);
-    buttonUserPage->setStyleSheet("background: black;"
-                                  "border-radius: 25px;");
-
-    buttonPrivateMessages->setFixedSize(120, 30);
-    buttonPrivateMessages->setStyleSheet(buttonDefaultStyle);
-    buttonPrivateMessages->setText("Messages");
-
-    buttonFriends->setFixedSize(120, 30);
-    buttonFriends->setStyleSheet(buttonDefaultStyle);
-    buttonFriends->setText("Friends");
-
     globalChatWidget->setFixedSize(536, 440);
     globalChatWidget->setLayout(globalChatLayout);
     globalChatLayout->setSpacing(0);
@@ -99,13 +76,6 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChatLayout->addWidget(listOfGlobalMessages, 0, 0, 8, 9);
     globalChatLayout->addWidget(affixImageWidget->getSendedImage(), 6,0,2,9, Qt::AlignLeft | Qt::AlignBottom);
     globalChatLayout->addWidget(sendWidget->getMainWidget(), 8, 0, 2, 9);
-
-    menuListLayout->setSpacing(0);
-    menuListLayout->setContentsMargins(0, 4, 0, 0);
-    menuListLayout->addWidget(buttonUserPage, 0, Qt::AlignTop | Qt::AlignCenter);
-    menuListLayout->addWidget(buttonFriends, 0, Qt::AlignTop);
-    menuListLayout->addWidget(buttonPrivateMessages, 0, Qt::AlignTop);
-    menuListLayout->addWidget(new QWidget(menuListWidget), 7);
 
     stackOfWidgets->addWidget(globalChatWidget);
     stackOfWidgets->setCurrentWidget(globalChatWidget);
@@ -180,7 +150,6 @@ MainWindow::~MainWindow(){
     delete mainWidget;
     delete mainLayout;
     delete menuListWidget;
-    delete menuListLayout;
 
     delete sendWidget;
     delete affixImageWidget;
@@ -189,8 +158,4 @@ MainWindow::~MainWindow(){
     delete globalChatWidget;
     delete globalChatLayout;
     delete listOfGlobalMessages;
-
-    delete buttonUserPage;
-    delete buttonPrivateMessages;
-    delete buttonFriends;
 }

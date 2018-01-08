@@ -58,7 +58,7 @@ void TCPClient::reading(){
                 emit flood(response.value("Time").toInt());
             }
             else if(response.value("Value").toString() == "Ban"){
-                qDebug() << "Ban";
+                emit banStarted(response.value("Time").toInt());
             }
         }
         else if(response.value("Target").toString() == "Message delivery"){

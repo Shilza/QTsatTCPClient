@@ -40,6 +40,7 @@ signals:
     void messageReceived(QString, QString, int);
     void flood(int);
     void banFinished(bool);
+    void banStarted(uint);
 
 private slots:
     void reading();

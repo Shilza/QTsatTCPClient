@@ -1,6 +1,9 @@
 #ifndef DEF_H
 #define DEF_H
 
+#define MAINWINDOW_WIDTH 660
+#define MAINWINDOW_HEIGHT 444
+
 #define HOST_IP "31.131.27.154"
 
 #define HANDSHAKE 0

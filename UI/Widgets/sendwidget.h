@@ -21,7 +21,6 @@ public:
     QWidget *getMainWidget();
     GlobalTextEdit *getTextMessage();
     ~SendWidget();
-    void ban(uint);
 
 private:
     QWidget *mainWidget;
@@ -70,6 +69,7 @@ private slots:
 
 public slots:
     void decrementing();
+    void ban(uint);
 };
 
 #endif // SENDWIDGET_H
