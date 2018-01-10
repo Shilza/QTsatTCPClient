@@ -18,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChatWidget = new QWidget(stackOfWidgets);
     globalChatLayout = new QGridLayout(globalChatWidget);
 
-    menuListWidget = new MenuList(mainWidget);
+    menuListWidget = new MenuList(height() - contentsMargins().top() - contentsMargins().bottom() - 2, mainWidget);
 
     listOfGlobalMessages = new QListWidget(globalChatWidget);
 
@@ -30,13 +30,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setCentralWidget(mainWidget);
 
-    menuListWidget->setFixedHeight(height() - contentsMargins().top() - contentsMargins().bottom() - 2);
-
     mainWidget->setLayout(mainLayout);
     mainLayout->setMargin(2);
     mainLayout->setSpacing(0);
     mainLayout->addWidget(stackOfWidgets, 6);
-    mainLayout->addWidget(menuListWidget, 1, Qt::AlignTop);
+    mainLayout->addWidget(menuListWidget->getWidget(), 1, Qt::AlignTop);
 
     listOfGlobalMessages->setMinimumSize(300, 250);
     listOfGlobalMessages->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);

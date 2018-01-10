@@ -1,15 +1,30 @@
 #include "menulist.h"
 
-MenuList::MenuList(QWidget *parent) : QWidget(parent){
-    menuListLayout = new QVBoxLayout(this);
-    setLayout(menuListLayout);
+MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
+    widget = new QWidget(this);
+    menuListLayout = new QVBoxLayout(widget);
+    widget->setLayout(menuListLayout);
+    widget->setFixedHeight(height);
 
-    buttonUserPage = new QPushButton(this);
-    buttonPrivateMessages = new QPushButton(this);
-    buttonFriends = new QPushButton(this);
-    buttonPreSettings = new QPushButton(this);
+    buttonUserPage = new QPushButton(widget);
+    buttonPrivateMessages = new QPushButton(widget);
+    buttonFriends = new QPushButton(widget);
 
-    buttonPreSettings->setFixedHeight(15);
+    menuListLayout->setSpacing(0);
+    menuListLayout->setContentsMargins(0, 4, 0, 3);
+    menuListLayout->addWidget(buttonUserPage, 0, Qt::AlignTop | Qt::AlignCenter);
+    menuListLayout->addWidget(buttonFriends, 0, Qt::AlignTop);
+    menuListLayout->addWidget(buttonPrivateMessages, 0, Qt::AlignTop);
+    menuListLayout->addWidget(new QWidget(widget), 6);
+
+    preSettings = new PreSettings(widget);
+    buttonPreSettings = new QPushButton(widget);
+
+    menuListLayout->addWidget(buttonPreSettings, 1);
+
+
+
+    buttonPreSettings->setFixedSize(120, 15);
 
     buttonUserPage->setFixedSize(50, 50);
     buttonUserPage->setStyleSheet("background: black;"
@@ -31,15 +46,22 @@ MenuList::MenuList(QWidget *parent) : QWidget(parent){
     buttonFriends->setStyleSheet(buttonDefaultStyle);
     buttonFriends->setText("Friends");
 
-    menuListLayout->setSpacing(0);
-    menuListLayout->setContentsMargins(0, 4, 0, 3);
-    menuListLayout->addWidget(buttonUserPage, 0, Qt::AlignTop | Qt::AlignCenter);
-    menuListLayout->addWidget(buttonFriends, 0, Qt::AlignTop);
-    menuListLayout->addWidget(buttonPrivateMessages, 0, Qt::AlignTop);
-    menuListLayout->addWidget(new QWidget(this), 6);
-    menuListLayout->addWidget(buttonPreSettings, 1);
 
-    preSettings = new PreSettings(this);
-    preSettings->setStyleSheet("background: black;");
-    preSettings->move(0, 0);
+
+    preSettings->move(1, widget->height());
+
+    connect(buttonPreSettings, SIGNAL(released()), SLOT(preSettingsMove()));
+}
+
+QWidget *MenuList::getWidget(){
+    return widget;
+}
+
+void MenuList::preSettingsMove(){
+    static bool isShown = false;
+    QPropertyAnimation *animation = new QPropertyAnimation(preSettings, "pos");
+    animation->setEndValue(QPoint(1, isShown ? widget->height() : widget->height() - buttonPreSettings->height() - preSettings->getWidget()->height() - 5));
+    animation->setDuration(300);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    isShown = !isShown;
 }
