@@ -25,10 +25,9 @@ private:
 
     PreSettings *preSettings;
 
-signals:
-
 private slots:
     void preSettingsMove();
+
 };
 
 #endif // MENULIST_H

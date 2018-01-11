@@ -7,6 +7,8 @@ PreSettings::PreSettings(QWidget *parent) : QWidget(parent){
 
     mainLayout = new QVBoxLayout(widget);
     widget->setLayout(mainLayout);
+    mainLayout->setSpacing(0);
+    mainLayout->setMargin(2);
 
     buttonBansHistory = new QPushButton(widget);
     buttonExit = new QPushButton(widget);
@@ -32,9 +34,10 @@ PreSettings::PreSettings(QWidget *parent) : QWidget(parent){
     buttonExit->setStyleSheet(buttonDefaultStyle);
     buttonSettings->setStyleSheet(buttonDefaultStyle);
 
-    buttonBansHistory->setFixedWidth(100);
-    buttonExit->setFixedWidth(100);
-    buttonSettings->setFixedWidth(100);
+    buttonBansHistory->setFixedSize(114, 20);
+    buttonExit->setFixedSize(114, 20);
+    buttonSettings->setFixedSize(114, 20);
+
 
     mainLayout->addWidget(buttonExit, 1, Qt::AlignHCenter);
     mainLayout->addWidget(buttonSettings, 1, Qt::AlignHCenter);
@@ -48,5 +51,8 @@ QWidget *PreSettings::getWidget(){
 }
 
 void PreSettings::exit(){
-
+    QJsonObject request;
+    request.insert("Target", "Exit");
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
+

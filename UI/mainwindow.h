@@ -42,6 +42,7 @@ private:
     AffixImageWidget *affixImageWidget;
 
     QListWidget *listOfGlobalMessages;
+    QListWidget *listBansHistory;
 
     ImageView *imageView;
 

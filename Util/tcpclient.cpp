@@ -66,6 +66,8 @@ void TCPClient::reading(){
         }
         else if(response.value("Target").toString() == "Ban finished")
             emit banFinished(response.value("Value") == "True");
+        else if(response.value("Target").toString() == "Exit")
+            emit exit();
     }
 
     /*buffer.resize(socket->pendingDatagramSize());
@@ -82,4 +84,3 @@ void TCPClient::reading(){
 
     emit updating();*/
 }
-

@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChatWidget = new QWidget(stackOfWidgets);
     globalChatLayout = new QGridLayout(globalChatWidget);
 
+    listBansHistory = new QListWidget(stackOfWidgets);
+
     menuListWidget = new MenuList(height() - contentsMargins().top() - contentsMargins().bottom() - 2, mainWidget);
 
     listOfGlobalMessages = new QListWidget(globalChatWidget);
@@ -75,7 +77,10 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChatLayout->addWidget(affixImageWidget->getSendedImage(), 6,0,2,9, Qt::AlignLeft | Qt::AlignBottom);
     globalChatLayout->addWidget(sendWidget->getMainWidget(), 8, 0, 2, 9);
 
+    listBansHistory->setFixedSize(536, 440);
+
     stackOfWidgets->addWidget(globalChatWidget);
+    stackOfWidgets->addWidget(listBansHistory);
     stackOfWidgets->setCurrentWidget(globalChatWidget);
 
     //connect(sendWidget, SIGNAL(messageSended()), this, SLOT(printMessages()));
@@ -85,6 +90,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit()), listOfGlobalMessages, SLOT(clear()));
 }
 
 void MainWindow::start(uint time){
@@ -110,9 +116,8 @@ void MainWindow::printMessages(QString nickname, QString message, int time){
 
     QLabel *labelNickname = new QLabel(nickname, widget);
     QLabel *timeOfMessage = new QLabel(QDateTime::fromTime_t(time).time().toString(), widget);
-    //The purpose of this slot is to select a random line from our list of fortunes, encode it into a QByteArray using QDataStream, and then write it to the connecting socket. This is a common way to transfer binary data using QTcpSocket. First we create a QByteArray and a QDataStream object, passing the bytearray to QDataStream's constructor. We then explicitly set the protocol version of QDataStream to QDataStream::Qt_4_0 to ensure that we can communicate with clients from future versions of Qt (see QDataStream::setVersion()). We continue by streaming in a random fortune.
     WrapLabel *textOfMessage = new WrapLabel(widget);
-    QLabel *button = new QLabel("Sas", widget);
+    QLabel *button = new QLabel(widget);
 
     button->setStyleSheet("background: black;");
     button->setFixedSize(30,30);
@@ -157,3 +162,5 @@ MainWindow::~MainWindow(){
     delete globalChatLayout;
     delete listOfGlobalMessages;
 }
+
+//The purpose of this slot is to select a random line from our list of fortunes, encode it into a QByteArray using QDataStream, and then write it to the connecting socket. This is a common way to transfer binary data using QTcpSocket. First we create a QByteArray and a QDataStream object, passing the bytearray to QDataStream's constructor. We then explicitly set the protocol version of QDataStream to QDataStream::Qt_4_0 to ensure that we can communicate with clients from future versions of Qt (see QDataStream::setVersion()). We continue by streaming in a random fortune.

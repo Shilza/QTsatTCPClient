@@ -3,6 +3,7 @@
 
 #include <QVBoxLayout>
 #include <QPushButton>
+#include <Util/tcpclient.h>
 
 class PreSettings : public QWidget
 {
@@ -18,10 +19,9 @@ private:
     QPushButton *buttonExit;
     QPushButton *buttonSettings;
 
-signals:
-
 private slots:
     void exit();
+
 };
 
 #endif // PRESETTINGS_H

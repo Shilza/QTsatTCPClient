@@ -337,7 +337,7 @@ void AuthWindow::authorizationSend(){
     QJsonObject request;
     request.insert("Target", "Authorization");
     request.insert("Login", lineLog->text());
-    request.insert("Password", linePass->text());
+    request.insert("Password", QString::fromUtf8(QCryptographicHash::hash(linePass->text().toUtf8(), QCryptographicHash::Md5).toHex()));
     TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
@@ -424,10 +424,128 @@ void AuthWindow::registrationCodeSend(){
     request.insert("Target", "Registration code");
     request.insert("Email", lineEmail->text());
     request.insert("Nickname", lineLog->text());
-    request.insert("Password", linePass->text());
+    request.insert("Password", QString::fromUtf8(QCryptographicHash::hash(linePass->text().toUtf8(), QCryptographicHash::Md5).toHex()));
     request.insert("Code", lineConfirmCode->text());
     TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
+
+
+void AuthWindow::buttonOk_released(){
+    if(location == LOC_RECOVERY_EMAIL){
+        if(lineLog->text()==""){
+            lineLog->setErrorStyleSheet();
+        }
+        else{
+            if(!isOnline()){
+                labelError->setText("No Internet access");
+                emit errorHasOccured();
+            }
+            else{
+                emit loadingWasStart();
+                errorHide();
+
+                timerWaitingAnswer->start();
+                QTimer::singleShot(500, this, SLOT(recoveryEmailSend()));
+            }
+        }
+    }
+    else if(location == LOC_RECOVERY_CODE){
+        if(lineConfirmCode->text()==""){
+            lineConfirmCode->setErrorStyleSheet();
+        }
+        else{
+
+            if(!isOnline()){
+                labelError->setText("No Internet access");
+                emit errorHasOccured();
+            }
+            else{
+                emit loadingWasStart();
+                errorHide();
+                lineConfirmCode->setDisabledOverride();
+
+                timerWaitingAnswer->start();
+                QTimer::singleShot(500, this, SLOT(recoveryCodeSend()));
+            }
+        }
+    }
+    else if(location == LOC_RECOVERY_PASS){
+
+        if(lineRecoveryConfirmPass->text()==""){
+            lineRecoveryConfirmPass->setErrorStyleSheet();
+        }
+        if(lineRecoveryPass->text()==""){
+            isRecoveryPassEmpty=true;
+            lineRecoveryPass->setStyleSheet(QString("font-family: Century Gothic;"
+                                                    "font-size: %1px;"
+                                                    "background: transparent;"
+                                                    "border: 1px solid red;"
+                                                    "border-right: 0px;"
+                                                    "color: #B5EBEE;").arg(defaultFontSize));
+            buttonRecoveryEye->setStyleSheet("border: 1px solid red;"
+                                             "border-left: 0px;");
+        }
+        else if(lineRecoveryConfirmPass->text()!=lineRecoveryPass->text()){
+            lineRecoveryConfirmPass->setErrorStyleSheet();
+        }
+        else{
+
+            if(!isOnline()){
+                labelError->setText("No Internet access");
+                emit errorHasOccured();
+            }
+            else{
+                emit loadingWasStart();
+                errorHide();
+                lineRecoveryConfirmPass->setDisabledOverride();
+                labelRecoveryPass->setDisabled(true);
+                lineRecoveryPass->setDisabled(true);
+                buttonRecoveryEye->setDisabled(true);
+                lineRecoveryPass->setStyleSheet(QString("AuthLineEdit{"
+                                                        "font-family: Century Gothic;"
+                                                        "font-size: %1px;"
+                                                        "background: transparent;"
+                                                        "border: 1px solid #cccccc;"
+                                                        "border-right: 0px;"
+                                                        "color: #B5EBEE;"
+                                                        "}").arg(defaultFontSize));
+                buttonRecoveryEye->setStyleSheet("border: 1px solid #cccccc; border-left: 0px;");
+                buttonRecoveryEye->setStyleSheet("border: 1px solid #cccccc; border-left: 0px");
+
+                timerWaitingAnswer->start();
+                QTimer::singleShot(500, this, SLOT(recoveryNewPassSend()));
+            }
+        }
+    }
+}
+
+void AuthWindow::recoveryEmailSend(){
+    QJsonObject request;
+    request.insert("Target", "Recovery");
+    request.insert("Value", lineLog->text());
+
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
+}
+
+void AuthWindow::recoveryCodeSend(){
+    QJsonObject request;
+    request.insert("Target", "Recovery code");
+    request.insert("Value", lineLog->text());
+    request.insert("Code", lineConfirmCode->text());
+
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
+}
+
+void AuthWindow::recoveryNewPassSend(){
+    QJsonObject request;
+    request.insert("Target", "Recovery new pass");
+    request.insert("Value", lineLog->text());
+    request.insert("Password", QString::fromUtf8(QCryptographicHash::hash(lineRecoveryPass->text().toUtf8(), QCryptographicHash::Md5).toHex()));
+
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
+}
+
+
 
 void AuthWindow::labelSuccessHide(){
     timerLabelSuccess->stop();
@@ -452,6 +570,9 @@ void AuthWindow::authorizationReceived(QString value, uint time){
     }
     else if(value == "Authorization successful"){
         emit startMainWindow(time);
+        cancelPreloading();
+        errorHide();
+        linePass->clear();
         close();
     }
 }
@@ -714,122 +835,6 @@ void AuthWindow::recoveryNewPassReceived(QString value){
     else if(value == "Password hasn't been changed"){
         //TODO
     }
-}
-
-
-void AuthWindow::buttonOk_released(){
-    if(location == LOC_RECOVERY_EMAIL){
-        if(lineLog->text()==""){
-            lineLog->setErrorStyleSheet();
-        }
-        else{
-            if(!isOnline()){
-                labelError->setText("No Internet access");
-                emit errorHasOccured();
-            }
-            else{
-                emit loadingWasStart();
-                errorHide();
-
-                timerWaitingAnswer->start();
-                QTimer::singleShot(500, this, SLOT(recoveryEmailSend()));
-            }
-        }
-    }
-    else if(location == LOC_RECOVERY_CODE){
-        if(lineConfirmCode->text()==""){
-            lineConfirmCode->setErrorStyleSheet();
-        }
-        else{
-
-            if(!isOnline()){
-                labelError->setText("No Internet access");
-                emit errorHasOccured();
-            }
-            else{
-                emit loadingWasStart();
-                errorHide();
-                lineConfirmCode->setDisabledOverride();
-
-                timerWaitingAnswer->start();
-                QTimer::singleShot(500, this, SLOT(recoveryCodeSend()));
-            }
-        }
-    }
-    else if(location == LOC_RECOVERY_PASS){
-
-        if(lineRecoveryConfirmPass->text()==""){
-            lineRecoveryConfirmPass->setErrorStyleSheet();
-        }
-        if(lineRecoveryPass->text()==""){
-            isRecoveryPassEmpty=true;
-            lineRecoveryPass->setStyleSheet(QString("font-family: Century Gothic;"
-                                                    "font-size: %1px;"
-                                                    "background: transparent;"
-                                                    "border: 1px solid red;"
-                                                    "border-right: 0px;"
-                                                    "color: #B5EBEE;").arg(defaultFontSize));
-            buttonRecoveryEye->setStyleSheet("border: 1px solid red;"
-                                             "border-left: 0px;");
-        }
-        else if(lineRecoveryConfirmPass->text()!=lineRecoveryPass->text()){
-            lineRecoveryConfirmPass->setErrorStyleSheet();
-        }
-        else{
-
-            if(!isOnline()){
-                labelError->setText("No Internet access");
-                emit errorHasOccured();
-            }
-            else{
-                emit loadingWasStart();
-                errorHide();
-                lineRecoveryConfirmPass->setDisabledOverride();
-                labelRecoveryPass->setDisabled(true);
-                lineRecoveryPass->setDisabled(true);
-                buttonRecoveryEye->setDisabled(true);
-                lineRecoveryPass->setStyleSheet(QString("AuthLineEdit{"
-                                                        "font-family: Century Gothic;"
-                                                        "font-size: %1px;"
-                                                        "background: transparent;"
-                                                        "border: 1px solid #cccccc;"
-                                                        "border-right: 0px;"
-                                                        "color: #B5EBEE;"
-                                                        "}").arg(defaultFontSize));
-                buttonRecoveryEye->setStyleSheet("border: 1px solid #cccccc; border-left: 0px;");
-                buttonRecoveryEye->setStyleSheet("border: 1px solid #cccccc; border-left: 0px");
-
-                timerWaitingAnswer->start();
-                QTimer::singleShot(500, this, SLOT(recoveryNewPassSend()));
-            }
-        }
-    }
-}
-
-void AuthWindow::recoveryEmailSend(){
-    QJsonObject request;
-    request.insert("Target", "Recovery");
-    request.insert("Value", lineLog->text());
-
-    TCPClient::getInstance().send(QJsonDocument(request).toJson());
-}
-
-void AuthWindow::recoveryCodeSend(){
-    QJsonObject request;
-    request.insert("Target", "Recovery code");
-    request.insert("Value", lineLog->text());
-    request.insert("Code", lineConfirmCode->text());
-
-    TCPClient::getInstance().send(QJsonDocument(request).toJson());
-}
-
-void AuthWindow::recoveryNewPassSend(){
-    QJsonObject request;
-    request.insert("Target", "Recovery new pass");
-    request.insert("Value", lineLog->text());
-    request.insert("Password", lineRecoveryPass->text());
-
-    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 

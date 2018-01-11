@@ -41,6 +41,7 @@ signals:
     void flood(int);
     void banFinished(bool);
     void banStarted(uint);
+    void exit();
 
 private slots:
     void reading();
