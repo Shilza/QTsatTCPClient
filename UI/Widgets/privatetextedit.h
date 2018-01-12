@@ -14,6 +14,7 @@ signals:
     void enter();
 private slots:
     void textEditSizeChange(QSizeF changedSize);
+
 };
 
 #endif // PRIVATETEXTEDIT_H

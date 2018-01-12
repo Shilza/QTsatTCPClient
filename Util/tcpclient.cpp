@@ -15,15 +15,6 @@ TCPClient &TCPClient::getInstance(){
     return instance;
 }
 
-void TCPClient::sendMessage(QString msg){
-    QJsonObject request;
-
-    request.insert("Target", "GMessage");
-    request.insert("Message", msg);
-
-    send(QJsonDocument(request).toJson());
-}
-
 void TCPClient::send(QByteArray request){
     socket->write(request);
 }
@@ -68,6 +59,8 @@ void TCPClient::reading(){
             emit banFinished(response.value("Value") == "True");
         else if(response.value("Target").toString() == "Exit")
             emit exit();
+        else if(response.value("Target").toString() == "Bans history")
+            emit bansHistory(response.value("Page").toArray());
     }
 
     /*buffer.resize(socket->pendingDatagramSize());

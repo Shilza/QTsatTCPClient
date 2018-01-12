@@ -13,6 +13,7 @@ class MenuList : public QWidget
 public:
     explicit MenuList(int height, QWidget *parent = nullptr);
     QWidget* getWidget();
+    PreSettings* getPreSettings() const;
 
 private:
     QWidget *widget;

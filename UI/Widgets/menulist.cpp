@@ -57,6 +57,10 @@ QWidget *MenuList::getWidget(){
     return widget;
 }
 
+PreSettings *MenuList::getPreSettings() const{
+    return preSettings;
+}
+
 void MenuList::preSettingsMove(){
     static bool isShown = false;
     QPropertyAnimation *animation = new QPropertyAnimation(preSettings, "pos");

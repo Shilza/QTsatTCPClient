@@ -44,7 +44,8 @@ SOURCES += \
     UI/Widgets/imageview.cpp \
     Util/tcpclient.cpp \
     UI/Widgets/menulist.cpp \
-    UI/Widgets/presettings.cpp
+    UI/Widgets/presettings.cpp \
+    UI/Widgets/banshistory.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -61,7 +62,8 @@ HEADERS += \
     UI/Widgets/imageview.h \
     Util/tcpclient.h \
     UI/Widgets/menulist.h \
-    UI/Widgets/presettings.h
+    UI/Widgets/presettings.h \
+    UI/Widgets/banshistory.h
 
 FORMS += \
         UI/mainwindow.ui \

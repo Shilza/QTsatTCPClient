@@ -18,8 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChatWidget = new QWidget(stackOfWidgets);
     globalChatLayout = new QGridLayout(globalChatWidget);
 
-    listBansHistory = new QListWidget(stackOfWidgets);
-
     menuListWidget = new MenuList(height() - contentsMargins().top() - contentsMargins().bottom() - 2, mainWidget);
 
     listOfGlobalMessages = new QListWidget(globalChatWidget);
@@ -29,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     sendWidget = new SendWidget(globalChatWidget);
 
     imageView = new ImageView(this);
+
+    bansHistory = new BansHistory(stackOfWidgets);
 
     setCentralWidget(mainWidget);
 
@@ -42,31 +42,8 @@ MainWindow::MainWindow(QWidget *parent) :
     listOfGlobalMessages->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     listOfGlobalMessages->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     listOfGlobalMessages->setStyleSheet("border-color: gray;");
-    listOfGlobalMessages->verticalScrollBar()->setStyleSheet("QScrollBar:vertical{"
-                                                             "background: white;"
-                                                             "border-top-right-radius: 4px;"
-                                                             "border-bottom-right-radius: 4px;"
-                                                             "width: 8px;"
-                                                             "margin: 0px;"
-                                                             "}"
-                                                             "QScrollBar:handle:vertical{"
-                                                             "background: gray;"
-                                                             "border-radius: 2px;"
-                                                             "min-height: 20px;"
-                                                             "margin: 0px 2px 0px 2px;"
-                                                             "}"
-                                                             "QScrollBar:add-line:vertical{"
-                                                             "background: transparent;"
-                                                             "height: 0px;"
-                                                             "subcontrol-position: right;"
-                                                             "subcontrol-origin: margin;"
-                                                             "}"
-                                                             "QScrollBar:sub-line:vertical{"
-                                                             "background: transparent;"
-                                                             "height: 0px;"
-                                                             "subcontrol-position: left;"
-                                                             "subcontrol-origin: margin;"
-                                                             "}");
+
+    listOfGlobalMessages->verticalScrollBar()->setStyleSheet(defaultScrollBarStyle);
 
     globalChatWidget->setFixedSize(536, 440);
     globalChatWidget->setLayout(globalChatLayout);
@@ -77,10 +54,8 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChatLayout->addWidget(affixImageWidget->getSendedImage(), 6,0,2,9, Qt::AlignLeft | Qt::AlignBottom);
     globalChatLayout->addWidget(sendWidget->getMainWidget(), 8, 0, 2, 9);
 
-    listBansHistory->setFixedSize(536, 440);
-
     stackOfWidgets->addWidget(globalChatWidget);
-    stackOfWidgets->addWidget(listBansHistory);
+    stackOfWidgets->addWidget(bansHistory->getList());
     stackOfWidgets->setCurrentWidget(globalChatWidget);
 
     //connect(sendWidget, SIGNAL(messageSended()), this, SLOT(printMessages()));
@@ -91,6 +66,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
     connect(&(TCPClient::getInstance()), SIGNAL(exit()), listOfGlobalMessages, SLOT(clear()));
+
+    connect(menuListWidget->getPreSettings(), SIGNAL(showBansHistory()), SLOT(showBansHistory()));
 }
 
 void MainWindow::start(uint time){
@@ -101,8 +78,14 @@ void MainWindow::start(uint time){
 }
 
 void MainWindow::sendMessage(QString message){
-    if(message!="")
-        TCPClient::getInstance().sendMessage(message);
+    if(message == "")
+        return;
+
+    QJsonObject request;
+
+    request.insert("Target", "GMessage");
+    request.insert("Message", message);
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 void MainWindow::printMessages(QString nickname, QString message, int time){
@@ -143,6 +126,11 @@ void MainWindow::printMessages(QString nickname, QString message, int time){
     QListWidgetItem* item = new QListWidgetItem(listOfGlobalMessages);
     item->setSizeHint(QSize(widget->width(), layout->sizeHint().height()));
     listOfGlobalMessages->setItemWidget(item, widget);
+}
+
+void MainWindow::showBansHistory(){
+    stackOfWidgets->setCurrentWidget(bansHistory->getList());
+    bansHistory->start();
 }
 
 MainWindow::~MainWindow(){

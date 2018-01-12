@@ -9,6 +9,8 @@
 #include <QScrollBar>
 #include <QStackedWidget>
 #include <QPixmap>
+#include <QSvgWidget>
+#include <QLocale>
 #include "UI/Widgets/imageview.h"
 #include "UI/Widgets/sendwidget.h"
 #include "UI/Widgets/affiximagewidget.h"
@@ -16,6 +18,7 @@
 #include "UI/Widgets/globaltextedit.h"
 #include "UI/Widgets/privatetextedit.h"
 #include "UI/Widgets/wraplabel.h"
+#include "UI/Widgets/banshistory.h"
 #include "Util/tcpclient.h"
 #include "UI/Widgets/menulist.h"
 
@@ -37,12 +40,12 @@ private:
     QGridLayout *globalChatLayout;
     MenuList *menuListWidget;
 
-
     SendWidget *sendWidget;
     AffixImageWidget *affixImageWidget;
 
     QListWidget *listOfGlobalMessages;
-    QListWidget *listBansHistory;
+
+    BansHistory *bansHistory;
 
     ImageView *imageView;
 
@@ -53,6 +56,7 @@ public:
 private slots:
     void sendMessage(QString);
     void printMessages(QString, QString, int);
+    void showBansHistory();
 
 public slots:
     void start(uint);

@@ -21,6 +21,10 @@ private:
 
 private slots:
     void exit();
+    void loadBansHistory();
+
+signals:
+    void showBansHistory();
 
 };
 

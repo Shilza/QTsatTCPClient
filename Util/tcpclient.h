@@ -6,6 +6,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QJsonParseError>
+#include <QJsonArray>
 #include "Config/def.h"
 
 class TCPClient : public QObject
@@ -19,13 +20,12 @@ private:
 
     TCPClient(TCPClient const&) = delete;
     TCPClient& operator= (TCPClient const&) = delete;
+    QByteArray buffer;
+    QString nickname;
 
 public:
     static TCPClient& getInstance();
-    void sendMessage(QString msg);
     void send(QByteArray);
-    QByteArray buffer;
-    QString nickname;
 
 signals:
     void updating();
@@ -42,6 +42,7 @@ signals:
     void banFinished(bool);
     void banStarted(uint);
     void exit();
+    void bansHistory(QJsonArray);
 
 private slots:
     void reading();

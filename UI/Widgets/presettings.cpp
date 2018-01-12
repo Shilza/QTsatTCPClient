@@ -44,6 +44,7 @@ PreSettings::PreSettings(QWidget *parent) : QWidget(parent){
     mainLayout->addWidget(buttonBansHistory, 1, Qt::AlignHCenter);
 
     connect(buttonExit, SIGNAL(released()), SLOT(exit()));
+    connect(buttonBansHistory, SIGNAL(released()), SLOT(loadBansHistory()));
 }
 
 QWidget *PreSettings::getWidget(){
@@ -54,5 +55,13 @@ void PreSettings::exit(){
     QJsonObject request;
     request.insert("Target", "Exit");
     TCPClient::getInstance().send(QJsonDocument(request).toJson());
+}
+
+void PreSettings::loadBansHistory(){
+    QJsonObject request;
+    request.insert("Target", "Bans history");
+    request.insert("Page", 0);
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
+    emit showBansHistory();
 }
 
