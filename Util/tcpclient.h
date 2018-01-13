@@ -42,7 +42,7 @@ signals:
     void banFinished(bool);
     void banStarted(uint);
     void exit();
-    void bansHistory(QJsonArray);
+    void bansHistory(QJsonArray, bool);
 
 private slots:
     void reading();

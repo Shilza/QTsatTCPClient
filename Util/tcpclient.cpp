@@ -45,22 +45,19 @@ void TCPClient::reading(){
         else if(response.value("Target").toString() == "Message status"){
             if(!response.contains("Value"))
                 emit messageSended();
-            else if(response.value("Value").toString() == "Flood"){
+            else if(response.value("Value").toString() == "Flood")
                 emit flood(response.value("Time").toInt());
-            }
-            else if(response.value("Value").toString() == "Ban"){
+            else if(response.value("Value").toString() == "Ban")
                 emit banStarted(response.value("Time").toInt());
-            }
         }
-        else if(response.value("Target").toString() == "Message delivery"){
+        else if(response.value("Target").toString() == "Message delivery")
             emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt());
-        }
         else if(response.value("Target").toString() == "Ban finished")
             emit banFinished(response.value("Value") == "True");
         else if(response.value("Target").toString() == "Exit")
             emit exit();
         else if(response.value("Target").toString() == "Bans history")
-            emit bansHistory(response.value("Page").toArray());
+            emit bansHistory(response.value("Page").toArray(), response.contains("Value"));
     }
 
     /*buffer.resize(socket->pendingDatagramSize());

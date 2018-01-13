@@ -14,11 +14,13 @@ public:
     explicit MenuList(int height, QWidget *parent = nullptr);
     QWidget* getWidget();
     PreSettings* getPreSettings() const;
+    QPushButton* getGlobalChatButton() const;
 
 private:
     QWidget *widget;
     QVBoxLayout *menuListLayout;
 
+    QPushButton *buttonGlobalChat;
     QPushButton *buttonUserPage;
     QPushButton *buttonPrivateMessages;
     QPushButton *buttonFriends;

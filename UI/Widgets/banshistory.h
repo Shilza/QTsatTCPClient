@@ -23,9 +23,10 @@ private:
     QListWidget *listBansHistory;
     QSvgWidget *preloader;
     quint8 currentLastPage;
+    bool end;
 
 private slots:
-    void showBansHistory(QJsonArray);
+    void showBansHistory(QJsonArray, bool);
     void loadNewPage(int);
 
 };

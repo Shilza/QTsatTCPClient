@@ -7,6 +7,7 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     widget->setLayout(menuListLayout);
     widget->setFixedHeight(height);
 
+    buttonGlobalChat = new QPushButton(widget);
     buttonUserPage = new QPushButton(widget);
     buttonPrivateMessages = new QPushButton(widget);
     buttonFriends = new QPushButton(widget);
@@ -14,6 +15,7 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     menuListLayout->setSpacing(0);
     menuListLayout->setContentsMargins(0, 4, 0, 3);
     menuListLayout->addWidget(buttonUserPage, 0, Qt::AlignTop | Qt::AlignCenter);
+    menuListLayout->addWidget(buttonGlobalChat, 0, Qt::AlignTop);
     menuListLayout->addWidget(buttonFriends, 0, Qt::AlignTop);
     menuListLayout->addWidget(buttonPrivateMessages, 0, Qt::AlignTop);
     menuListLayout->addWidget(new QWidget(widget), 6);
@@ -45,7 +47,9 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     buttonFriends->setStyleSheet(buttonDefaultStyle);
     buttonFriends->setText("Friends");
 
-
+    buttonGlobalChat->setFixedSize(120, 30);
+    buttonGlobalChat->setStyleSheet(buttonDefaultStyle);
+    buttonGlobalChat->setText("Global chat");
 
     preSettings->move(1, widget->height());
 
@@ -53,12 +57,16 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(exit()), SLOT(preSettingsMove()));
 }
 
-QWidget *MenuList::getWidget(){
+QWidget* MenuList::getWidget(){
     return widget;
 }
 
-PreSettings *MenuList::getPreSettings() const{
+PreSettings* MenuList::getPreSettings() const{
     return preSettings;
+}
+
+QPushButton* MenuList::getGlobalChatButton() const{
+    return buttonGlobalChat;
 }
 
 void MenuList::preSettingsMove(){

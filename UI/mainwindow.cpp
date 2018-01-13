@@ -68,6 +68,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(&(TCPClient::getInstance()), SIGNAL(exit()), listOfGlobalMessages, SLOT(clear()));
 
     connect(menuListWidget->getPreSettings(), SIGNAL(showBansHistory()), SLOT(showBansHistory()));
+    connect(menuListWidget->getGlobalChatButton(), SIGNAL(released()), SLOT(goToGlobalChat()));
 }
 
 void MainWindow::start(uint time){
@@ -131,6 +132,14 @@ void MainWindow::printMessages(QString nickname, QString message, int time){
 void MainWindow::showBansHistory(){
     stackOfWidgets->setCurrentWidget(bansHistory->getList());
     bansHistory->start();
+}
+
+void MainWindow::goToGlobalChat(){
+    stackOfWidgets->setCurrentWidget(globalChatWidget);
+    QJsonObject request;
+    request.insert("Target", "Location");
+    request.insert("Value", "Global chat");
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 MainWindow::~MainWindow(){

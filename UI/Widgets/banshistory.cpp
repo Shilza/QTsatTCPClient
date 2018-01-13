@@ -15,7 +15,7 @@ BansHistory::BansHistory(QWidget *parent) : QWidget(parent){
     preloader->move((listBansHistory->width() - preloader->width())/2, (listBansHistory->height() - preloader->height())/2);
     preloader->close();
 
-    connect(&(TCPClient::getInstance()), SIGNAL(bansHistory(QJsonArray)), SLOT(showBansHistory(QJsonArray)));
+    connect(&(TCPClient::getInstance()), SIGNAL(bansHistory(QJsonArray, bool)), SLOT(showBansHistory(QJsonArray, bool)));
     connect(listBansHistory->verticalScrollBar(), SIGNAL(valueChanged(int)), SLOT(loadNewPage(int)));
 }
 
@@ -25,13 +25,16 @@ QListWidget *BansHistory::getList(){
 
 void BansHistory::start(){
     currentLastPage = 1;
+    end = false;
+    listBansHistory->clear();
     preloader->show();
 }
 
-void BansHistory::showBansHistory(QJsonArray bans){
+void BansHistory::showBansHistory(QJsonArray bans, bool isContains){
     preloader->close();
+    end = isContains;
 
-    for(int i = 0; i < bans.count(); i++){
+    for(int i = bans.count()-1 ; i >= 0; i--){
         QJsonObject temp = bans.at(i).toObject();
 
         QWidget *widget = new QWidget(listBansHistory);
@@ -76,7 +79,7 @@ void BansHistory::showBansHistory(QJsonArray bans){
 }
 
 void BansHistory::loadNewPage(int value){
-    if(value == listBansHistory->verticalScrollBar()->maximum()){
+    if(value == listBansHistory->verticalScrollBar()->maximum() && !end){
         QJsonObject request;
         request.insert("Target", "Bans history");
         request.insert("Page", currentLastPage++);

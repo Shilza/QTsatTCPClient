@@ -57,6 +57,7 @@ private slots:
     void sendMessage(QString);
     void printMessages(QString, QString, int);
     void showBansHistory();
+    void goToGlobalChat();
 
 public slots:
     void start(uint);
