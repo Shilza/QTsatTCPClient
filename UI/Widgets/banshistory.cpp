@@ -1,6 +1,7 @@
 #include "banshistory.h"
 
 BansHistory::BansHistory(QWidget *parent) : QWidget(parent){
+    close();
     listBansHistory = new QListWidget(parent);
     preloader = new QSvgWidget(listBansHistory);
 
@@ -8,7 +9,16 @@ BansHistory::BansHistory(QWidget *parent) : QWidget(parent){
     listBansHistory->verticalScrollBar()->setStyleSheet(defaultScrollBarStyle);
 
     listBansHistory->setFixedSize(536, 440);
-
+    listBansHistory->setSelectionMode(QAbstractItemView::NoSelection);
+    listBansHistory->setStyleSheet("QListWidget::item{"
+                                   "background: transparent;"
+                                   "}"
+                                   "QListWidget::item:hover{"
+                                   "background: rgba(0, 0, 0, 15);"
+                                   "}"
+                                   "QListWidget::item:focus:pressed{"
+                                   "background: transparent;"
+                                   "}");
     preloader->load(QString(":images/pre.svg"));
     preloader->setStyleSheet("background: transparent;");
     preloader->resize(40, 40);
@@ -39,19 +49,48 @@ void BansHistory::showBansHistory(QJsonArray bans, bool isContains){
 
         QWidget *widget = new QWidget(listBansHistory);
         QGridLayout *layout = new QGridLayout(widget);
+        QWidget *bansBody = new QWidget(widget);
+        QHBoxLayout *bansLayout = new QHBoxLayout(bansBody);
+        ClickableLabel *labelModerator = new ClickableLabel(bansBody, false);
+        QLocale locale = QLocale(QLocale::English);
+        QLabel *startTime = new QLabel(locale.toString(QDateTime::fromTime_t(temp.value("StartTime").toInt()), "d MMM yy hh:mm:ss"), widget);
+        QLabel *finishTime = new QLabel(locale.toString(QDateTime::fromTime_t(temp.value("FinishTime").toInt()), "d MMM yy hh:mm:ss"), widget);
+        QLabel *labelCause = new QLabel("For " + temp.value("Cause").toString() + " by ", bansBody);
+        QLabel *button = new QLabel(widget);
+        QWidget *nickname = new QWidget(widget);
+        QHBoxLayout *nicknameLayout = new QHBoxLayout(nickname);
+        ClickableLabel *labelNickname = new ClickableLabel(nickname, false);
+        QWidget *widgetBicycle = new QWidget(nickname);
+
         layout->setContentsMargins(2,5,5,5);
         layout->setSpacing(0);
         layout->setHorizontalSpacing(5);
         layout->setVerticalSpacing(5);
         widget->setLayout(layout);
 
-        QLabel *labelNickname = new QLabel(temp.value("Nickname").toString(), widget);
-        QLabel *cause = new QLabel("For " + temp.value("Cause").toString() + " by " + temp.value("Moderator").toString(), widget);
-        QLabel *button = new QLabel(widget);
+        nickname->setLayout(nicknameLayout);
+        nicknameLayout->setSpacing(0);
+        nicknameLayout->setMargin(0);
+        nicknameLayout->addWidget(labelNickname);
+        nicknameLayout->addWidget(widgetBicycle);
 
-        QLocale locale = QLocale(QLocale::English);
-        QLabel *startTime = new QLabel(locale.toString(QDateTime::fromTime_t(temp.value("StartTime").toInt()), "d MMM yy hh:mm:ss"), widget);
-        QLabel *finishTime = new QLabel(locale.toString(QDateTime::fromTime_t(temp.value("FinishTime").toInt()), "d MMM yy hh:mm:ss"), widget);
+        labelNickname->setText(temp.value("Nickname").toString());
+        labelNickname->setStyleSheet("ClickableLabel:hover{"
+                                     "color: #5EBFED;"
+                                     "}");
+
+        bansLayout->setSpacing(0);
+        bansLayout->setMargin(0);
+        bansBody->setLayout(bansLayout);
+        labelCause->setStyleSheet("font-family: Century Gothic;"
+                                  "background: transparent;");
+
+        labelModerator->setStyleSheet("ClickableLabel:hover{"
+                                      "color: #5EBFED;"
+                                      "}");
+        labelModerator->setText(temp.value("Moderator").toString());
+        bansLayout->addWidget(labelCause);
+        bansLayout->addWidget(labelModerator);
 
         button->setStyleSheet("background: black;");
         button->setFixedSize(30,30);
@@ -59,11 +98,11 @@ void BansHistory::showBansHistory(QJsonArray bans, bool isContains){
         labelNickname->setFixedHeight(10);
         startTime->setFixedHeight(10);
 
-        cause->setStyleSheet("border: 0px;"
+        bansBody->setStyleSheet("border: 0px;"
                              "background: transparent;");
 
-        layout->addWidget(labelNickname, 0, 1, 1, 1);
-        layout->addWidget(cause, 1, 1, 1, 7, Qt::AlignHCenter | Qt::AlignTop);
+        layout->addWidget(nickname, 0, 1, 1, 1);
+        layout->addWidget(bansBody, 1, 1, 1, 7, Qt::AlignHCenter | Qt::AlignTop);
         layout->addWidget(startTime, 0, 7, 1, 1, Qt::AlignRight);
         layout->addWidget(finishTime, 1, 7, 1, 1, Qt::AlignRight);
 

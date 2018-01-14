@@ -12,12 +12,14 @@ class ImageView : public QWidget
 public:
    explicit ImageView(QWidget *parent=0);
     ~ImageView();
+
 private:
     QPushButton *picture;
     QPushButton *buttonClose;
     QGridLayout *mainLayout;
     ClickableLabel *background;
     bool eventFilter(QObject *target, QEvent *event);
+
 public slots:
     void setPicture(QPixmap);
 };

@@ -3,6 +3,7 @@
 #include <QDebug>
 
 SendWidget::SendWidget(QWidget *parent): QWidget(parent){
+    close();
     mainWidget = new QWidget(this);
     sendLayout = new QGridLayout(mainWidget);
 

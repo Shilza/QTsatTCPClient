@@ -12,13 +12,10 @@
 #include <QSvgWidget>
 #include <QLocale>
 #include "UI/Widgets/imageview.h"
-#include "UI/Widgets/sendwidget.h"
-#include "UI/Widgets/affiximagewidget.h"
 #include "UI/Widgets/clickablelabel.h"
-#include "UI/Widgets/globaltextedit.h"
 #include "UI/Widgets/privatetextedit.h"
-#include "UI/Widgets/wraplabel.h"
 #include "UI/Widgets/banshistory.h"
+#include "UI/Widgets/globalchat.h"
 #include "Util/tcpclient.h"
 #include "UI/Widgets/menulist.h"
 
@@ -36,16 +33,9 @@ private:
     QStackedWidget *stackOfWidgets;
     QWidget *mainWidget;
     QHBoxLayout *mainLayout;
-    QWidget *globalChatWidget;
-    QGridLayout *globalChatLayout;
     MenuList *menuListWidget;
-
-    SendWidget *sendWidget;
-    AffixImageWidget *affixImageWidget;
-
-    QListWidget *listOfGlobalMessages;
-
     BansHistory *bansHistory;
+    GlobalChat *globalChat;
 
     ImageView *imageView;
 
@@ -54,8 +44,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void sendMessage(QString);
-    void printMessages(QString, QString, int);
     void showBansHistory();
     void goToGlobalChat();
 

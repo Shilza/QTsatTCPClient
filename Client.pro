@@ -45,7 +45,8 @@ SOURCES += \
     Util/tcpclient.cpp \
     UI/Widgets/menulist.cpp \
     UI/Widgets/presettings.cpp \
-    UI/Widgets/banshistory.cpp
+    UI/Widgets/banshistory.cpp \
+    UI/Widgets/globalchat.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -63,7 +64,8 @@ HEADERS += \
     Util/tcpclient.h \
     UI/Widgets/menulist.h \
     UI/Widgets/presettings.h \
-    UI/Widgets/banshistory.h
+    UI/Widgets/banshistory.h \
+    UI/Widgets/globalchat.h
 
 FORMS += \
         UI/mainwindow.ui \

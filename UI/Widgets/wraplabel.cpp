@@ -42,6 +42,10 @@ void WrapLabel::wrapText(QString text){
     setText(final);
 }
 
+void WrapLabel::setItem(QListWidgetItem *item){
+    this->item = item;
+}
+
 void WrapLabel::keyPressEvent(QKeyEvent *event){
     QLabel::keyPressEvent(event);
     if(event->matches(QKeySequence::Copy) || event->matches(QKeySequence::Cut)){
@@ -50,6 +54,10 @@ void WrapLabel::keyPressEvent(QKeyEvent *event){
             tempText.remove(i,2);
         QApplication::clipboard()->setText(tempText);
     }
+}
+
+void WrapLabel::mouseReleaseEvent(QMouseEvent *event){
+    emit select(item);
 }
 
 WrapLabel::~WrapLabel(){}

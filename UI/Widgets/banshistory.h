@@ -9,6 +9,7 @@
 #include <QScrollBar>
 #include <QDateTime>
 #include "Config/def.h"
+#include "UI/Widgets/clickablelabel.h"
 #include "Util/tcpclient.h"
 
 class BansHistory : public QWidget

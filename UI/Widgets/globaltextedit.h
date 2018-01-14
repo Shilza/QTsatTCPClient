@@ -13,10 +13,12 @@ class GlobalTextEdit : public QTextEdit{
     Q_OBJECT
 public:
     explicit GlobalTextEdit(QWidget *parent=0);
+
 private:
     void keyPressEvent(QKeyEvent *e);
     void dropEvent(QDropEvent *e);
     void dragEnterEvent(QDragEnterEvent *e);
+
 signals:
     void enter();
     void imageReceived(QPixmap);

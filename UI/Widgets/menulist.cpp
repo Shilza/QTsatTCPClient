@@ -2,6 +2,7 @@
 #include <QDebug>
 
 MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
+    close();
     widget = new QWidget(this);
     menuListLayout = new QVBoxLayout(widget);
     widget->setLayout(menuListLayout);
