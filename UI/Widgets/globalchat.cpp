@@ -40,6 +40,7 @@ GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
 
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
     connect(&(TCPClient::getInstance()), SIGNAL(exit()), listOfGlobalMessages, SLOT(clear()));
+    connect(affixImageWidget, SIGNAL(originalSizeReleased(QPixmap)), &(ImageView::getInstance()), SLOT(setPicture(QPixmap)));
 }
 
 QWidget *GlobalChat::getWidget(){
@@ -48,10 +49,6 @@ QWidget *GlobalChat::getWidget(){
 
 SendWidget *GlobalChat::getSendWidget(){
     return sendWidget;
-}
-
-AffixImageWidget *GlobalChat::getAffixWidget(){
-    return affixImageWidget;
 }
 
 void GlobalChat::printMessages(QString strNickname, QString message, int time){

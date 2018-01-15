@@ -7,6 +7,7 @@
 #include "UI/Widgets/wraplabel.h"
 #include "UI/Widgets/sendwidget.h"
 #include "UI/Widgets/affiximagewidget.h"
+#include "UI/Widgets/imageview.h"
 #include "Config/def.h"
 #include "Util/tcpclient.h"
 
@@ -17,7 +18,6 @@ public:
     explicit GlobalChat(QWidget *parent = nullptr);
     QWidget* getWidget();
     SendWidget* getSendWidget();
-    AffixImageWidget *getAffixWidget();
 
 private:
     QWidget *globalChatWidget;

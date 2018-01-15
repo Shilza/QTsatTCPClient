@@ -37,8 +37,6 @@ private:
     BansHistory *bansHistory;
     GlobalChat *globalChat;
 
-    ImageView *imageView;
-
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();

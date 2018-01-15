@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     resize(MAINWINDOW_WIDTH, MAINWINDOW_HEIGHT);
 
+
     mainWidget = new QWidget(this);
     mainLayout = new QHBoxLayout(mainWidget);
 
@@ -19,9 +20,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     globalChat = new GlobalChat(stackOfWidgets);
 
-    imageView = new ImageView(this);
-
     bansHistory = new BansHistory(stackOfWidgets);
+
+    ImageView::getInstance().create(this);
 
     setCentralWidget(mainWidget);
 
@@ -37,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(menuListWidget->getPreSettings(), SIGNAL(showBansHistory()), SLOT(showBansHistory()));
     connect(menuListWidget->getGlobalChatButton(), SIGNAL(released()), SLOT(goToGlobalChat()));
-    connect(globalChat->getAffixWidget(), SIGNAL(originalSizeReleased(QPixmap)), imageView, SLOT(setPicture(QPixmap)));
 }
 
 void MainWindow::start(uint time){
@@ -63,7 +63,6 @@ void MainWindow::goToGlobalChat(){
 MainWindow::~MainWindow(){
     delete ui;
 
-    delete imageView;
     delete stackOfWidgets;
     delete mainWidget;
     delete mainLayout;

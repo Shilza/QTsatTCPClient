@@ -1,4 +1,5 @@
 #include "imageview.h"
+#include <QDebug>
 
 ImageView::ImageView(QWidget *parent) : QWidget(parent){
     mainLayout = new QGridLayout(this);
@@ -8,8 +9,6 @@ ImageView::ImageView(QWidget *parent) : QWidget(parent){
     picture = new QPushButton(this);
     buttonClose = new QPushButton(this);
 
-    picture->setFixedSize(parent->width()*3/4, parent->height()*3/4);
-    picture->setIconSize(picture->maximumSize());
     picture->setStyleSheet("background: rgba(0,0,0,180);"
                            "border: 1px solid black;");
 
@@ -33,7 +32,6 @@ ImageView::ImageView(QWidget *parent) : QWidget(parent){
 
     setLayout(mainLayout);
     setContentsMargins(0, 0, 0, 0);
-    setFixedSize(parent->size());
     close();
 
     connect(buttonClose, SIGNAL(released()), this, SLOT(close()));
@@ -57,9 +55,25 @@ bool ImageView::eventFilter(QObject *target, QEvent *event){
     return QWidget::eventFilter(target, event);
 }
 
+ImageView &ImageView::getInstance(){
+    static ImageView instance;
+    return instance;
+}
+
 ImageView::~ImageView(){
     delete picture;
     delete buttonClose;
     delete mainLayout;
     delete background;
+}
+
+void ImageView::create(QWidget *parent){
+    setParent(parent);
+    close();
+    picture->setFixedSize(parent->width()*3/4, parent->height()*3/4);
+    picture->setIconSize(picture->maximumSize());
+    int *bottomMargin;
+    parent->getContentsMargins(nullptr, nullptr, nullptr, bottomMargin);
+    qDebug() << *bottomMargin;
+    setFixedSize(parent->width(), parent->height()+2);
 }
