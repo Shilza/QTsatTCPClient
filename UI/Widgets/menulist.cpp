@@ -1,5 +1,4 @@
 #include "menulist.h"
-#include <QDebug>
 
 MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     close();
@@ -55,7 +54,7 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     preSettings->move(1, widget->height());
 
     connect(buttonPreSettings, SIGNAL(released()), SLOT(preSettingsMove()));
-    connect(&(TCPClient::getInstance()), SIGNAL(exit()), SLOT(preSettingsMove()));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(preSettingsMove()));
 }
 
 QWidget* MenuList::getWidget(){

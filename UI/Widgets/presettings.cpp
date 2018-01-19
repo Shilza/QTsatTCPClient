@@ -1,5 +1,4 @@
 #include "presettings.h"
-#include <QDebug>
 
 PreSettings::PreSettings(QWidget *parent) : QWidget(parent){
     widget = new QWidget(this);
@@ -37,7 +36,6 @@ PreSettings::PreSettings(QWidget *parent) : QWidget(parent){
     buttonBansHistory->setFixedSize(114, 20);
     buttonExit->setFixedSize(114, 20);
     buttonSettings->setFixedSize(114, 20);
-
 
     mainLayout->addWidget(buttonExit, 1, Qt::AlignHCenter);
     mainLayout->addWidget(buttonSettings, 1, Qt::AlignHCenter);

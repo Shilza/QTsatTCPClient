@@ -1,7 +1,5 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "Config/def.h"
-#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -38,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(menuListWidget->getPreSettings(), SIGNAL(showBansHistory()), SLOT(showBansHistory()));
     connect(menuListWidget->getGlobalChatButton(), SIGNAL(released()), SLOT(goToGlobalChat()));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(exit(bool)));
 }
 
 void MainWindow::start(uint time){
@@ -58,6 +57,12 @@ void MainWindow::goToGlobalChat(){
     request.insert("Target", "Location");
     request.insert("Value", "Global chat");
     TCPClient::getInstance().send(QJsonDocument(request).toJson());
+}
+
+void MainWindow::exit(bool isExit){
+    close();
+    if(isExit)
+        stackOfWidgets->setCurrentWidget(globalChat->getWidget());
 }
 
 MainWindow::~MainWindow(){

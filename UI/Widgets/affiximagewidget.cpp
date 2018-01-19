@@ -1,6 +1,4 @@
 #include "affiximagewidget.h"
-#include <QDebug>
-#include <QBuffer>
 
 AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     close();
@@ -42,11 +40,11 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     toolTipAffixClose->setGeometry(0, 0, 100, 26);
     toolTipAffixClose->setIcon(QIcon(":/images/toolTipAffixClose.png"));
     toolTipAffixClose->setIconSize(QSize(100, 26));
-    //toolTipAffixClose->setPixmap(QPixmap(":/images/toolTipAffixClose.png").scaled(toolTipAffixClose->width(), toolTipAffixClose->height()));
     toolTipAffixClose->close();
 
-    connect(originalSize, SIGNAL(released()), this, SLOT(originalSize_released()));
-    connect(buttonCloseAffixedPicture, SIGNAL(released()), this, SLOT(buttonCloseAffixedPicture_released()));
+    connect(originalSize, SIGNAL(released()), SLOT(originalSize_released()));
+    connect(buttonCloseAffixedPicture, SIGNAL(released()), SLOT(buttonCloseAffixedPicture_released()));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(buttonCloseAffixedPicture_released()));
 }
 
 QWidget *AffixImageWidget::getSendedImage(){
@@ -55,16 +53,6 @@ QWidget *AffixImageWidget::getSendedImage(){
 
 void AffixImageWidget::receivedImageTreatment(QPixmap image){
     affixImage = image;
-/*
-    QByteArray b;
-    QBuffer buf(&b);
-    buf.open(QIODevice::WriteOnly);
-    image.save(&buf, "JPG");
-
-    buf.close();
-
-    affixImage.loadFromData(b);
-*/
     if(image.height() > image.width()){
         int leftTop = image.height()/2-image.width()/2;
 

@@ -33,6 +33,7 @@
 #define LOC_RECOVERY_EMAIL 4
 #define LOC_RECOVERY_CODE 5
 #define LOC_RECOVERY_PASS 6
+#define LOC_AUTHENTICATION 7
 
 namespace Ui {
 class AuthWindow;
@@ -72,6 +73,7 @@ private:
     QPushButton *buttonRecoveryEye;
     QPushButton *buttonMinimize;
 
+    QLabel *labelAuthentication;
     QLabel *labelUncorrectNickname;
     QLabel *labelPass;
     QLabel *labelRecoveryPass;
@@ -90,6 +92,7 @@ private:
     QTimer *timerWaitingAnswer;
     QTimer *timerLabelSuccess;
     QTimer *timerErrorLabel;
+    QTimer *timerAuthentication;
 
     bool isOnline();
     void mousePressEvent(QMouseEvent *event);
@@ -98,10 +101,11 @@ private:
     void changeEvent(QEvent *e);
     void setPassEnabled();
     void resizeAll();
+    bool eventFilter(QObject *target, QEvent *event);
 
 public:
     explicit AuthWindow(QMainWindow *parent = 0);
-    bool eventFilter(QObject *target, QEvent *event);
+    void start(QString nickname, QString, QString);
     ~AuthWindow();
 
 signals:
@@ -151,6 +155,9 @@ private slots:
     void recoveryReceived(QString);
     void recoveryCodeReceived(QString);
     void recoveryNewPassReceived(QString);
+
+    void labelAuthenticationChanging();
+    void tokensDead();
 };
 
 #endif // AUTHWINDOW_H

@@ -1,6 +1,4 @@
 #include "sendwidget.h"
-#include "Config/def.h"
-#include <QDebug>
 
 SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     close();
@@ -188,8 +186,6 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     buttonAudios->installEventFilter(this);
     buttonDocuments->installEventFilter(this);
 
-
-
     connect(buttonSend, SIGNAL(released()), SLOT(send()));
     connect(textMessage, SIGNAL(enter()), SLOT(send()));
     connect(textMessage, SIGNAL(textChanged()), SLOT(showSymbolsCount()));
@@ -287,7 +283,8 @@ void SendWidget::banFinishing(bool isFinished){
 }
 
 void SendWidget::decrementing(){
-    countOfAttachment--;
+    if(countOfAttachment > 0)
+        countOfAttachment--;
 }
 
 SendWidget::~SendWidget(){

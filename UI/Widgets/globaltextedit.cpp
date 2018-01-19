@@ -67,8 +67,6 @@ void GlobalTextEdit::keyPressEvent(QKeyEvent *event){
 }
 
 void GlobalTextEdit::dropEvent(QDropEvent *e){
-    //const QMimeData* mime = e->mimeData();
-
     QMimeData data;
     data.setText("");
 

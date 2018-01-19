@@ -10,11 +10,24 @@ int main(int argc, char *argv[])
 
     MainWindow *mainWindow = new MainWindow;
     AuthWindow *authWindow = new AuthWindow;
+
+    QFile configFile("sosik.txt");
+    if (!configFile.exists())
+        authWindow->show();
+    else{
+        if(!configFile.open(QIODevice::ReadOnly)){
+            configFile.remove();
+            authWindow->show();
+        }
+        else{
+            QJsonObject configJson = QJsonDocument::fromJson(configFile.readAll()).object();
+            authWindow->start(configJson.value("Nickname").toString(), configJson.value("Access token").toString(), configJson.value("Refresh token").toString());
+        }
+        configFile.close();
+    }
     authWindow->show();
 
     QObject::connect(authWindow, SIGNAL(startMainWindow(uint)), mainWindow, SLOT(start(uint)));
-    QObject::connect(&(TCPClient::getInstance()), SIGNAL(exit()), mainWindow, SLOT(close()));
-    QObject::connect(&(TCPClient::getInstance()), SIGNAL(exit()), authWindow, SLOT(show()));
 
     return a.exec();
 }

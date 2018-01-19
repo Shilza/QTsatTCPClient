@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QEvent>
 #include <QHBoxLayout>
+#include "Util/tcpclient.h"
 
 class AffixImageWidget : public QWidget
 {

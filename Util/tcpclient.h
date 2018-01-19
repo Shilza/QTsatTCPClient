@@ -1,6 +1,7 @@
 #ifndef UDPCLIENT_H
 #define UDPCLIENT_H
 #include <QObject>
+#include <QFile>
 #include <QTcpSocket>
 #include <QHostAddress>
 #include <QJsonObject>
@@ -20,12 +21,18 @@ private:
 
     TCPClient(TCPClient const&) = delete;
     TCPClient& operator= (TCPClient const&) = delete;
-    QByteArray buffer;
-    QString nickname;
+
+    QByteArray lastRequest;
+    QString accessToken;
+    QString refreshToken;
+
+    void tokenRefreshing();
+    void configFileUpdate(QString nickname);
 
 public:
     static TCPClient& getInstance();
     void send(QByteArray);
+    void setTokens(QString, QString);
 
 signals:
     void updating();
@@ -41,7 +48,7 @@ signals:
     void flood(int);
     void banFinished(bool);
     void banStarted(uint);
-    void exit();
+    void exit(bool);
     void bansHistory(QJsonArray, bool);
 
 private slots:

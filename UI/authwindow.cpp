@@ -19,6 +19,9 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     timerErrorLabel->setInterval(5000);
     timerErrorLabel->setSingleShot(true);
 
+    timerAuthentication = new QTimer(this);
+    timerAuthentication->setInterval(DURATION);
+
     QTime randTime(0,0,0);
     qsrand(randTime.secsTo(QTime::currentTime()));
 
@@ -75,8 +78,8 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     labelSignIn->setCursor(Qt::PointingHandCursor);
     labelForgotPass->setCursor(Qt::PointingHandCursor);
 
-    lineEmail->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,15}")));
-    lineLog->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,15}")));
+    lineEmail->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,32}")));
+    lineLog->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,12}")));
     lineConfirmPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[._]){6,32}$")));
     linePass->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[._]){6,32}$")));
     lineRecoveryPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[._]){6,32}$")));
@@ -115,6 +118,8 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     lineLog->setMouseTracking(true);
     preloader->load(QString(":images/pre.svg"));
 
+    labelAuthentication = new QLabel(this);
+
     resizeAll();
 
     this->setAttribute(Qt::WA_TranslucentBackground);
@@ -140,6 +145,10 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
 
     defaultFontSize = (width()/260)*11;
     preloader->setStyleSheet("background:transparent;");
+
+    labelAuthentication->setStyleSheet(QString("background: transparent;"
+                                       "color: #d9d9d9;"
+                                       "font-size: %1px;").arg(defaultFontSize*3/2));
 
     buttonSignIn->setStyleSheet(strButtonStyle.arg(defaultFontSize));
     buttonSignUp->setStyleSheet(strButtonStyle.arg(defaultFontSize));
@@ -255,8 +264,6 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
 
     preloader->close();
 
-//    connect(socket, SIGNAL(readyRead()), this, SLOT(socketReading()));
-
     connect(this, SIGNAL(loadingWasStart()),this, SLOT(startPreloading()));
     connect(this, SIGNAL(errorHasOccured()), this, SLOT(cancelPreloading()));
 
@@ -285,6 +292,7 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     connect(timerWaitingAnswer, SIGNAL(timeout()), this, SLOT(waitingAnswer()));
     connect(timerLabelSuccess, SIGNAL(timeout()), this, SLOT(labelSuccessHide()));
     connect(timerErrorLabel, SIGNAL(timeout()), this, SLOT(errorHide()));
+    connect(timerAuthentication, SIGNAL(timeout()), this, SLOT(labelAuthenticationChanging()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(authorization(QString, uint)), SLOT(authorizationReceived(QString, uint)));
     connect(&(TCPClient::getInstance()), SIGNAL(registration(QString)), SLOT(registrationReceived(QString)));
@@ -293,6 +301,28 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
     connect(&(TCPClient::getInstance()), SIGNAL(recoveryCode(QString)), SLOT(recoveryCodeReceived(QString)));
     connect(&(TCPClient::getInstance()), SIGNAL(recoveryNewPass(QString)), SLOT(recoveryNewPassReceived(QString)));
     connect(&(TCPClient::getInstance()), SIGNAL(nicknameExisting(QString)), SLOT(nicknameExisting(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(tokensDead()));
+}
+
+void AuthWindow::start(QString nickname, QString accessToken, QString refreshToken){
+    lineLog->close();
+    linePass->close();
+    labelSignUp->close();
+    labelForgotPass->close();
+    buttonSignIn->close();
+    buttonEye->close();
+
+    labelAuthentication->setText("Authentication");
+    labelAuthentication->show();
+    timerAuthentication->start();
+    show();
+
+    TCPClient::getInstance().setTokens(accessToken, refreshToken);
+    QJsonObject request;
+    request.insert("Target", "Authorization");
+    request.insert("Access token", accessToken);
+    request.insert("Nickname", nickname);
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 
@@ -470,11 +500,11 @@ void AuthWindow::buttonOk_released(){
         }
     }
     else if(location == LOC_RECOVERY_PASS){
-
         if(lineRecoveryConfirmPass->text()==""){
             lineRecoveryConfirmPass->setErrorStyleSheet();
         }
-        if(lineRecoveryPass->text()==""){
+
+        if(lineRecoveryPass->text().length() < 6){
             isRecoveryPassEmpty=true;
             lineRecoveryPass->setStyleSheet(QString("font-family: Century Gothic;"
                                                     "font-size: %1px;"
@@ -546,7 +576,6 @@ void AuthWindow::recoveryNewPassSend(){
 }
 
 
-
 void AuthWindow::labelSuccessHide(){
     timerLabelSuccess->stop();
     QPropertyAnimation *animation = new QPropertyAnimation(opacityLabel, "opacity");
@@ -569,6 +598,18 @@ void AuthWindow::authorizationReceived(QString value, uint time){
         emit errorHasOccured();
     }
     else if(value == "Authorization successful"){
+        lineLog->show();
+        linePass->show();
+        labelSignUp->show();
+        labelForgotPass->show();
+        buttonSignIn->show();
+        buttonEye->show();
+
+        labelAuthentication->close();
+
+        timerAuthentication->stop();
+
+        gotoSignInLoc();
         emit startMainWindow(time);
         cancelPreloading();
         errorHide();
@@ -835,6 +876,32 @@ void AuthWindow::recoveryNewPassReceived(QString value){
     else if(value == "Password hasn't been changed"){
         //TODO
     }
+}
+
+void AuthWindow::labelAuthenticationChanging(){
+    static quint8 dots = 0;
+    QString text = "Authentication";
+    for(int i=0; i<dots%4; i++)
+        text += '.';
+    dots++;
+    labelAuthentication->setText(text);
+}
+
+void AuthWindow::tokensDead(){
+    lineLog->show();
+    linePass->show();
+    labelSignUp->show();
+    labelForgotPass->show();
+    buttonSignIn->show();
+    buttonEye->show();
+
+    labelAuthentication->close();
+
+    timerAuthentication->stop();
+
+    gotoSignInLoc();
+    errorHide();
+    show();
 }
 
 
@@ -1202,7 +1269,7 @@ void AuthWindow::gotoRecoveryLoc(){
     location=LOC_RECOVERY_EMAIL;
     lineLog->setFocus();
     isRecoveryPassEmpty=false;
-
+    lineLog->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,12}")));
     lineLog->setDefaultStyleSheet();
     linePass->setStyleSheet(QString("AuthLineEdit{"
                                     "font-family: Century Gothic;"
@@ -1257,7 +1324,7 @@ void AuthWindow::gotoSignUpLoc(){
     isPassEmpty=false;
 
     lineLog->setPlaceholderText("Nickname");
-    lineLog->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[_]){2,12}$")));
+    lineLog->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[_.]){3,12}$")));
 
     lineConfirmPass->show();
     lineEmail->show();
@@ -1427,6 +1494,7 @@ void AuthWindow::gotoSignInLoc(){
     lineLog->setFocus();
     isPassEmpty=false;
     setPassEnabled();
+    lineLog->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,12}")));
 
     lineEmail->setDefaultStyleSheet();
     lineLog->setDefaultStyleSheet();
@@ -1476,7 +1544,7 @@ void AuthWindow::gotoSignInLoc(){
         connect(localAnimations[0], SIGNAL(finished()), buttonOk, SLOT(close()));
 
     }
-    else if(location==LOC_REGISTRATION){
+    else if(location==LOC_REGISTRATION || location == LOC_AUTHENTICATION){
         QPropertyAnimation *animations[6];
 
         animations[0] = new QPropertyAnimation(labelForgotPass, "pos");
@@ -1648,8 +1716,6 @@ void AuthWindow::errorHide(){
 }
 
 void AuthWindow::resizeAll(){
-    //  quint16 windowSize = (QApplication::desktop()->width()/100)*25;
-
     quint16 windowSize = (QApplication::desktop()->width()/100)*25;
 
     if(QApplication::desktop()->width()<1366)
@@ -1747,6 +1813,9 @@ void AuthWindow::resizeAll(){
     labelSuccess->setGeometry(labelRegistrationSuccessfulX,labelRegistrationSuccessfulY,labelRegistrationSuccessfulW, labelRegistrationSuccessfulH);
     labelPass->setGeometry(defaultLineX, defaultY+lineHWithSpace, lineW, lineH);
     labelRecoveryPass->setGeometry(defaultLineX, height(), lineW, lineH);
+
+    labelAuthentication->setGeometry(windowSize/3, lineLogY+(lineLogH/2), windowSize, labelAuthentication->height());
+    //labelAuthentication->setGeometry(lineLogX, lineLogY, lineLogW, lineLogH);
 
     preloader->resize(preloaderW, preloaderH);
 }
@@ -1909,7 +1978,7 @@ bool AuthWindow::eventFilter(QObject *target, QEvent *event){
                                      "border-left: 0px;");
         }
     }
-    else if((target == lineRecoveryPass || target==buttonRecoveryEye) && labelPass->isEnabled() && !isPassEmpty){
+    else if((target == lineRecoveryPass || target==buttonRecoveryEye) && labelPass->isEnabled() && !isRecoveryPassEmpty){
         if(event->type()==QEvent::HoverEnter){
             if(!lineRecoveryPass->hasFocus()){
                 lineRecoveryPass->setStyleSheet(QString("AuthLineEdit{"

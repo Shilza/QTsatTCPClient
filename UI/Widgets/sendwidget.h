@@ -12,6 +12,7 @@
 #include "Util/floodtimer.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "UI/Widgets/globaltextedit.h"
+#include "Config/def.h"
 
 class SendWidget : public QWidget
 {

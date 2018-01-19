@@ -1,5 +1,4 @@
 #include "imageview.h"
-#include <QDebug>
 
 ImageView::ImageView(QWidget *parent) : QWidget(parent){
     mainLayout = new QGridLayout(this);
@@ -72,8 +71,5 @@ void ImageView::create(QWidget *parent){
     close();
     picture->setFixedSize(parent->width()*3/4, parent->height()*3/4);
     picture->setIconSize(picture->maximumSize());
-    int *bottomMargin;
-    parent->getContentsMargins(nullptr, nullptr, nullptr, bottomMargin);
-    qDebug() << *bottomMargin;
     setFixedSize(parent->width(), parent->height()+2);
 }

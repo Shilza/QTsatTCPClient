@@ -39,7 +39,7 @@ GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
-    connect(&(TCPClient::getInstance()), SIGNAL(exit()), listOfGlobalMessages, SLOT(clear()));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(clearAll(bool)));
     connect(affixImageWidget, SIGNAL(originalSizeReleased(QPixmap)), &(ImageView::getInstance()), SLOT(setPicture(QPixmap)));
 }
 
@@ -126,4 +126,9 @@ void GlobalChat::sendMessage(QString message){
     request.insert("Target", "GMessage");
     request.insert("Message", message);
     TCPClient::getInstance().send(QJsonDocument(request).toJson());
+}
+
+void GlobalChat::clearAll(bool){
+    listOfGlobalMessages->clear();
+    sendWidget->getTextMessage()->clear();
 }
