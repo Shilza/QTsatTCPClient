@@ -191,7 +191,7 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     connect(textMessage, SIGNAL(textChanged()), SLOT(showSymbolsCount()));
     connect(floodTimer, SIGNAL(errorTimeout()), SLOT(floodErrorHide()));
     connect(floodTimer, SIGNAL(showTimeout()), SLOT(updateTime()));
-    connect(textMessage, SIGNAL(imageReceived(QPixmap)), SLOT(imageReceivedRedirect(QPixmap)));
+    connect(textMessage, SIGNAL(imageReceived(QPixmap, QString)), SLOT(imageReceivedRedirect(QPixmap, QString)));
     connect(buttonPhotos, SIGNAL(released()), SLOT(selectImage()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(flood(int)), SLOT(floodReceived(int)));
@@ -236,10 +236,31 @@ void SendWidget::send(){
     emit messageSended(textMessage->toPlainText());
 }
 
-void SendWidget::imageReceivedRedirect(QPixmap image){
+void SendWidget::imageReceivedRedirect(QPixmap image, QString extension){
     if(countOfAttachment<1){
         countOfAttachment++;
-        emit imageReceived(image);
+
+        //for size
+        QByteArray tempArray;
+        QBuffer tempBuffer(&tempArray);
+        tempBuffer.open(QIODevice::WriteOnly);
+        image.save(&tempBuffer, extension == "image" ? "png" : extension.toStdString().c_str());
+        tempBuffer.close();
+
+        int size = tempArray.size();
+
+        if(size > MAX_AFFIX_SIZE)
+            emit affixToLarge();
+        else{
+            QJsonObject request;
+            request.insert("Target", "Post");
+            request.insert("Extension", extension);
+            request.insert("Location", "Global chat");
+            request.insert("Size", size);
+            TCPClient::getInstance().sendToFTP(request);
+
+            emit imageReceived(image);
+        }
     }
 }
 
@@ -247,7 +268,7 @@ void SendWidget::selectImage(){
     static QString lastPath = QDir::homePath();
     QString temp = QFileDialog::getOpenFileName(this, QObject::tr("Choose an image"), lastPath, QObject::tr("Image file (*.png *.jpg *.jpeg *.jpe *.bmp);;Все файлы (*.*)"));
     if(temp != ""){
-        imageReceivedRedirect(QPixmap(temp));
+        imageReceivedRedirect(QPixmap(temp), temp.split('.').back());
         lastPath = temp;
     }
 

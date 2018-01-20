@@ -21,7 +21,8 @@ private:
 
 signals:
     void enter();
-    void imageReceived(QPixmap);
+    void imageReceived(QPixmap image, QString extension);
+
 private slots:
     void validator();
 };

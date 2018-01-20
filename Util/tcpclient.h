@@ -14,7 +14,8 @@ class TCPClient : public QObject
 {
     Q_OBJECT
 private:
-    QTcpSocket *socket;
+    QTcpSocket *serverSocket;
+    QTcpSocket *ftpSocket;
     QHostAddress host;
 
     TCPClient(QObject *parent = 0);
@@ -23,15 +24,17 @@ private:
     TCPClient& operator= (TCPClient const&) = delete;
 
     QByteArray lastRequest;
+    QString nickname;
     QString accessToken;
     QString refreshToken;
 
     void tokenRefreshing();
-    void configFileUpdate(QString nickname);
+    void configFileUpdate();
 
 public:
     static TCPClient& getInstance();
-    void send(QByteArray);
+    void send(QByteArray request);
+    void sendToFTP(QJsonObject request);
     void setTokens(QString, QString);
 
 signals:
@@ -50,9 +53,12 @@ signals:
     void banStarted(uint);
     void exit(bool);
     void bansHistory(QJsonArray, bool);
+    void loadAffixDeny();
+    void loadAffixAllow();
 
 private slots:
-    void reading();
+    void controller();
+    void ftpController();
 };
 
 #endif // UDPCLIENT_H

@@ -2,13 +2,15 @@
 #include <QDebug>
 
 TCPClient::TCPClient(QObject *parent) : QObject(parent){
+    serverSocket = new QTcpSocket(this);
+    ftpSocket = new QTcpSocket(this);
 
-    socket = new QTcpSocket(this);
+    //host.setAddress(HOST_IP);
+    serverSocket->connectToHost(QHostAddress::LocalHost, SERVER_PORT);
+    ftpSocket->connectToHost(QHostAddress::LocalHost, FTP_PORT);
 
-    host.setAddress(HOST_IP);
-    socket->connectToHost(QHostAddress::LocalHost, 40000);
-
-    connect(socket, SIGNAL(readyRead()), this, SLOT(reading()));
+    connect(serverSocket, SIGNAL(readyRead()), SLOT(controller()));
+    connect(ftpSocket, SIGNAL(readyRead()), SLOT(ftpController()));
 }
 
 void TCPClient::tokenRefreshing(){
@@ -17,16 +19,16 @@ void TCPClient::tokenRefreshing(){
     request.insert("Refresh token", refreshToken);
 
     //DO NOT REPLACE THIS WITH "SEND" FUNCTION
-    socket->write(QJsonDocument(request).toJson());
+    serverSocket->write(QJsonDocument(request).toJson());
 }
 
-void TCPClient::configFileUpdate(QString nickname){
+void TCPClient::configFileUpdate(){
     QJsonObject configJson;
     configJson.insert("Nickname", nickname);
     configJson.insert("Access token", accessToken);
     configJson.insert("Refresh token", refreshToken);
 
-    QFile configFile("sosik.txt");
+    QFile configFile("config.txt");
     configFile.open(QIODevice::WriteOnly);
     configFile.write(QJsonDocument(configJson).toJson());
     configFile.close();
@@ -39,7 +41,14 @@ TCPClient &TCPClient::getInstance(){
 
 void TCPClient::send(QByteArray request){
     lastRequest = request;
-    socket->write(request);
+    serverSocket->write(request);
+}
+
+void TCPClient::sendToFTP(QJsonObject request){
+    request.insert("Nickname", nickname);
+    request.insert("Access token", accessToken);
+
+    ftpSocket->write(QJsonDocument(request).toJson());
 }
 
 void TCPClient::setTokens(QString accessToken, QString refreshToken){
@@ -47,8 +56,8 @@ void TCPClient::setTokens(QString accessToken, QString refreshToken){
     this->refreshToken = refreshToken;
 }
 
-void TCPClient::reading(){
-    QByteArray receivedObject = socket->readAll();
+void TCPClient::controller(){
+    QByteArray receivedObject = serverSocket->readAll();
 
     QJsonParseError error;
 
@@ -57,10 +66,11 @@ void TCPClient::reading(){
     if(error.error == QJsonParseError::NoError){
         if(response.value("Target").toString() == "Authorization"){
             if(response.contains("Access token")){
+                nickname = response.value("Nickname").toString();
                 accessToken = response.value("Access token").toString();
                 refreshToken = response.value("Refresh token").toString();
 
-                configFileUpdate(response.value("Nickname").toString());
+                configFileUpdate();
             }
 
             emit authorization(response.value("Value").toString(),
@@ -91,9 +101,10 @@ void TCPClient::reading(){
         else if(response.value("Target").toString() == "Ban finished")
             emit banFinished(response.value("Value") == "True");
         else if(response.value("Target").toString() == "Exit"){
-            QFile configFile("sosik.txt");
+            QFile configFile("config.txt");
             if(configFile.exists())
                 configFile.remove();
+            nickname = "";
             accessToken = "";
             refreshToken = "";
 
@@ -105,8 +116,25 @@ void TCPClient::reading(){
             tokenRefreshing();
         else if(response.value("Target").toString() == "Token refreshed"){
             accessToken = response.value("Access token").toString();
-            configFileUpdate(response.value("Nickname").toString());
+            configFileUpdate();
             send(lastRequest);
+        }
+    }
+}
+
+void TCPClient::ftpController(){
+    QByteArray receivedObject = serverSocket->readAll();
+
+    QJsonParseError error;
+
+    QJsonObject response = QJsonDocument::fromJson(receivedObject, &error).object();
+
+    if(error.error == QJsonParseError::NoError){
+        if(response.value("Target").toString() == "Post"){
+            if(response.value("Value").toString() == "Deny")
+                emit loadAffixDeny();
+            else if(response.value("Value").toString() == "Allow")
+                emit loadAffixAllow();
         }
     }
 }

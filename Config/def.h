@@ -33,4 +33,9 @@ const QString defaultScrollBarStyle = "QScrollBar:vertical{"
 
 #define MAX_GLOBAL_MESSAGE_SIZE 140
 
+#define SERVER_PORT 40000
+#define FTP_PORT 40001
+
+#define MAX_AFFIX_SIZE 10485760 //10MB
+
 #endif // DEF_H

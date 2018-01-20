@@ -1,4 +1,5 @@
 #include "globaltextedit.h"
+#include <QDebug>
 
 GlobalTextEdit::GlobalTextEdit(QWidget *parent) : QTextEdit(parent){
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -32,7 +33,7 @@ void GlobalTextEdit::keyPressEvent(QKeyEvent *event){
 
         const QMimeData* mime = QApplication::clipboard()->mimeData();
         if(mime->hasImage()){
-            emit imageReceived(mime->imageData().value<QPixmap>());
+            emit imageReceived(mime->imageData().value<QPixmap>(), "image");
             return;
         }
         else if(mime->hasText()){
@@ -70,22 +71,25 @@ void GlobalTextEdit::dropEvent(QDropEvent *e){
     QMimeData data;
     data.setText("");
 
-    if(e->mimeData()->hasImage()){
+    /*if(e->mimeData()->hasImage()){
         emit imageReceived(e->mimeData()->imageData().value<QPixmap>());
         QTextEdit::dropEvent(new QDropEvent(QPointF(0,0), Qt::IgnoreAction, &data, Qt::LeftButton, Qt::NoModifier));
     }
-    else if(e->mimeData()->hasUrls()){
+    else*/
+    if(e->mimeData()->hasUrls()){
         for(QUrl a : e->mimeData()->urls()){
-            QString ext = a.fileName().split('.').back();
-            if(ext == "jpg" || ext=="png" || ext=="bmp" || ext=="jpeg" || ext=="jpe"){
+            QString extension = a.fileName().split('.').back();
+            if(extension == "jpg" || extension=="png" || extension=="bmp" || extension=="jpeg" || extension=="jpe"){
                 QPixmap image;
                 image.load(a.path().right(a.path().length()-1));
-                emit imageReceived(image);
+
+                emit imageReceived(image, extension);
                 QTextEdit::dropEvent(new QDropEvent(QPointF(0,0), Qt::IgnoreAction, &data, Qt::LeftButton, Qt::NoModifier));
+                break;
             }
         }
     }
-    else {
+    else{
         if(e->mimeData()->hasText())
             e->setAccepted(false);
         QTextEdit::dropEvent(e);

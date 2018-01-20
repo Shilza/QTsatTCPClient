@@ -14,6 +14,8 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
 
     originalSize = new QPushButton(sendedImage);
 
+    labelLoadError = new ClickableLabel(sendedImage, false);
+
     buttonCloseAffixedPicture = new QPushButton(sendedImage);
 
     sendedImage->setFixedSize(sendedImageSize, sendedImageSize);
@@ -42,9 +44,19 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     toolTipAffixClose->setIconSize(QSize(100, 26));
     toolTipAffixClose->close();
 
+    labelLoadError->close();
+    labelLoadError->setText("Error");
+    labelLoadError->setAlignment(Qt::AlignCenter);
+    labelLoadError->setFixedSize(originalSize->size());
+    labelLoadError->setStyleSheet("background: rgba(0, 0, 0, 150);"
+                                  "border: 0px;"
+                                  "color: white;");
+
     connect(originalSize, SIGNAL(released()), SLOT(originalSize_released()));
     connect(buttonCloseAffixedPicture, SIGNAL(released()), SLOT(buttonCloseAffixedPicture_released()));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(buttonCloseAffixedPicture_released()));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadAffixDeny()), SLOT(affixError()));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadAffixAllow()), SLOT(affixAllow()));
 }
 
 QWidget *AffixImageWidget::getSendedImage(){
@@ -76,8 +88,21 @@ void AffixImageWidget::receivedImageTreatment(QPixmap image){
 }
 
 void AffixImageWidget::buttonCloseAffixedPicture_released(){
+    affixImage = QPixmap(); //cleaning
+    labelLoadError->close();
+    isLoadError = false;
     emit detachmentImage();
     sendedImage->close();
+}
+
+void AffixImageWidget::affixError(){
+    isLoadError = true;
+    labelLoadError->show();
+}
+
+void AffixImageWidget::affixAllow(){
+    isLoadError = false;
+    labelLoadError->close();
 }
 
 AffixImageWidget::~AffixImageWidget(){
@@ -98,7 +123,7 @@ bool AffixImageWidget::eventFilter(QObject *target, QEvent *event)
         else if(event->type() == QEvent::HoverLeave)
             toolTipAffixClose->close();
     }
-    else if(target==sendedImage){
+    else if(target==sendedImage && !isLoadError){
         if(event->type() == QEvent::HoverEnter)
             originalSize->show();
         else if(event->type() == QEvent::HoverLeave)

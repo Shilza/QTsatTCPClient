@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     MainWindow *mainWindow = new MainWindow;
     AuthWindow *authWindow = new AuthWindow;
 
-    QFile configFile("sosik.txt");
+    QFile configFile("config.txt");
     if (!configFile.exists())
         authWindow->show();
     else{
