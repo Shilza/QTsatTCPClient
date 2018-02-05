@@ -3,6 +3,7 @@
 #include <QPushButton>
 #include <QEvent>
 #include <QHBoxLayout>
+#include <QBuffer>
 #include "UI/Widgets/clickablelabel.h"
 #include "Util/tcpclient.h"
 
@@ -22,6 +23,7 @@ private:
     QPushButton *originalSize;
     ClickableLabel *labelLoadError;
     QPixmap affixImage;
+    QString extension;
 
     quint8 sendedImageSize = 60;
     quint8 closeButtonSize = 12;
@@ -34,7 +36,7 @@ signals:
     void detachmentImage();
 
 public slots:
-    void receivedImageTreatment(QPixmap);
+    void receivedImageTreatment(QPixmap image, QString extension);
 
 private slots:
     void originalSize_released();

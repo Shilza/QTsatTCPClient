@@ -51,6 +51,11 @@ void TCPClient::sendToFTP(QJsonObject request){
     ftpSocket->write(QJsonDocument(request).toJson());
 }
 
+void TCPClient::sendToFTP(QByteArray attachment){
+    qDebug() << "Send attachment";
+    ftpSocket->write(attachment);
+}
+
 void TCPClient::setUser(QString nickname, QString accessToken, QString refreshToken){
     this->nickname = nickname;
     this->accessToken = accessToken;
@@ -135,9 +140,9 @@ void TCPClient::ftpController(){
     if(error.error == QJsonParseError::NoError){
         if(response.value("Target").toString() == "Post"){
             if(response.value("Value").toString() == "Deny")
-                emit loadAffixDeny();
+                emit loadAttachmentDeny();
             else if(response.value("Value").toString() == "Allow")
-                emit loadAffixAllow();
+                emit loadAttachmentAllow();
         }
     }
 }

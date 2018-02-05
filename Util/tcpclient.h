@@ -1,5 +1,5 @@
-#ifndef UDPCLIENT_H
-#define UDPCLIENT_H
+#ifndef TCPCLIENT_H
+#define TCPCLIENT_H
 #include <QObject>
 #include <QFile>
 #include <QTcpSocket>
@@ -35,6 +35,7 @@ public:
     static TCPClient& getInstance();
     void send(QByteArray request);
     void sendToFTP(QJsonObject request);
+    void sendToFTP(QByteArray attachment);
     void setUser(QString nickname, QString accessToken, QString refreshToken);
 
 signals:
@@ -53,12 +54,12 @@ signals:
     void banStarted(uint);
     void exit(bool);
     void bansHistory(QJsonArray, bool);
-    void loadAffixDeny();
-    void loadAffixAllow();
+    void loadAttachmentDeny();
+    void loadAttachmentAllow();
 
 private slots:
     void controller();
     void ftpController();
 };
 
-#endif // UDPCLIENT_H
+#endif // TCPCLIENT_H

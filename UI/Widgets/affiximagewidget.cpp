@@ -1,4 +1,4 @@
-#include "affiximagewidget.h"
+#include "AffixImagewidget.h"
 
 AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     close();
@@ -55,16 +55,18 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     connect(originalSize, SIGNAL(released()), SLOT(originalSize_released()));
     connect(buttonCloseAffixedPicture, SIGNAL(released()), SLOT(buttonCloseAffixedPicture_released()));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(buttonCloseAffixedPicture_released()));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadAffixDeny()), SLOT(affixError()));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadAffixAllow()), SLOT(affixAllow()));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentDeny()), SLOT(affixError()));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentAllow()), SLOT(affixAllow()));
 }
 
 QWidget *AffixImageWidget::getSendedImage(){
     return mainWidget;
 }
 
-void AffixImageWidget::receivedImageTreatment(QPixmap image){
+void AffixImageWidget::receivedImageTreatment(QPixmap image, QString extension){
+    this->extension = extension;
     affixImage = image;
+
     if(image.height() > image.width()){
         int leftTop = image.height()/2-image.width()/2;
 
@@ -103,6 +105,11 @@ void AffixImageWidget::affixError(){
 void AffixImageWidget::affixAllow(){
     isLoadError = false;
     labelLoadError->close();
+    QByteArray attachment;
+    QBuffer buffer(&attachment);
+    buffer.open(QIODevice::WriteOnly);
+    affixImage.save(&buffer, extension.toStdString().c_str());
+    TCPClient::getInstance().sendToFTP(attachment);
 }
 
 AffixImageWidget::~AffixImageWidget(){

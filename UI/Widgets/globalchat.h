@@ -6,7 +6,7 @@
 #include <QListWidget>
 #include "UI/Widgets/wraplabel.h"
 #include "UI/Widgets/sendwidget.h"
-#include "UI/Widgets/affiximagewidget.h"
+#include "UI/Widgets/AffixImagewidget.h"
 #include "UI/Widgets/imageview.h"
 #include "Config/def.h"
 #include "Util/tcpclient.h"

@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(labelAttachmentSizeToLarge, SIGNAL(released()), labelAttachmentSizeToLarge, SLOT(close()));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(exit(bool)));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), labelAttachmentSizeToLarge, SLOT(close()));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadAffixDeny()), labelAttachmentSizeToLarge, SLOT(show()));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentDeny()), labelAttachmentSizeToLarge, SLOT(show()));
 
 }
 

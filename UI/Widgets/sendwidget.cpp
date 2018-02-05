@@ -237,10 +237,11 @@ void SendWidget::send(){
 }
 
 void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
-
     if(countOfAttachment<1){
         int size=0;
-        if(QString(affix.typeName()) == "QPixmap"){
+        QString typeName = QString(affix.typeName());
+        if(typeName == "QPixmap" || typeName == "QImage"){
+
             QPixmap image = qvariant_cast<QPixmap>(affix);
 
             if(image.isNull())
@@ -253,7 +254,7 @@ void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
                 return;
             }*/
 
-            emit imageReceived(image);
+            emit imageReceived(image, extension);
         }
 
         QJsonObject request;

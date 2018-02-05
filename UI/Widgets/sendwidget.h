@@ -56,7 +56,7 @@ private:
 
 signals:
     void messageSended(QString);
-    void imageReceived(QPixmap);
+    void imageReceived(QPixmap image, QString extension);
     void attachmentToLarge();
 
 private slots:

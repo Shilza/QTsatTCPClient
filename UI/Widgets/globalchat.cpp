@@ -35,7 +35,7 @@ GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     globalChatLayout->addWidget(sendWidget->getMainWidget(), 8, 0, 2, 9);
 
     connect(sendWidget, SIGNAL(messageSended(QString)), this, SLOT(sendMessage(QString)));
-    connect(sendWidget, SIGNAL(imageReceived(QPixmap)), affixImageWidget, SLOT(receivedImageTreatment(QPixmap)));
+    connect(sendWidget, SIGNAL(imageReceived(QPixmap, QString)), affixImageWidget, SLOT(receivedImageTreatment(QPixmap, QString)));
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
@@ -118,7 +118,6 @@ void GlobalChat::selectGlobalItem(QListWidgetItem *item){
 }
 
 void GlobalChat::sendMessage(QString message){
-    qDebug() << message.simplified();
     if(message.simplified() == " " || message.simplified() == "" || message == "")
         return;
 

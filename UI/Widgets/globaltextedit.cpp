@@ -1,5 +1,4 @@
 #include "globaltextedit.h"
-#include <QDebug>
 
 GlobalTextEdit::GlobalTextEdit(QWidget *parent) : QTextEdit(parent){
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

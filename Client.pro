@@ -47,7 +47,7 @@ SOURCES += \
     UI/Widgets/presettings.cpp \
     UI/Widgets/banshistory.cpp \
     UI/Widgets/globalchat.cpp \
-    Util/sizecount.cpp
+    Util/sizecounting.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -59,7 +59,6 @@ HEADERS += \
     UI/Widgets/globaltextedit.h \
     UI/Widgets/privatetextedit.h \
     UI/Widgets/wraplabel.h \
-    UI/Widgets/affiximagewidget.h \
     UI/Widgets/sendwidget.h \
     UI/Widgets/imageview.h \
     Util/tcpclient.h \
@@ -67,7 +66,8 @@ HEADERS += \
     UI/Widgets/presettings.h \
     UI/Widgets/banshistory.h \
     UI/Widgets/globalchat.h \
-    Util/sizecounting.h
+    Util/sizecounting.h \
+    UI/Widgets/AffixImagewidget.h
 
 FORMS += \
         UI/mainwindow.ui \
