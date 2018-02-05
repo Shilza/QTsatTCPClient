@@ -317,7 +317,7 @@ void AuthWindow::start(QString nickname, QString accessToken, QString refreshTok
     timerAuthentication->start();
     show();
 
-    TCPClient::getInstance().setTokens(accessToken, refreshToken);
+    TCPClient::getInstance().setUser(nickname, accessToken, refreshToken);
     QJsonObject request;
     request.insert("Target", "Authorization");
     request.insert("Access token", accessToken);

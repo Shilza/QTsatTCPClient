@@ -35,7 +35,7 @@ public:
     static TCPClient& getInstance();
     void send(QByteArray request);
     void sendToFTP(QJsonObject request);
-    void setTokens(QString, QString);
+    void setUser(QString nickname, QString accessToken, QString refreshToken);
 
 signals:
     void updating();

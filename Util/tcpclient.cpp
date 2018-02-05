@@ -51,7 +51,8 @@ void TCPClient::sendToFTP(QJsonObject request){
     ftpSocket->write(QJsonDocument(request).toJson());
 }
 
-void TCPClient::setTokens(QString accessToken, QString refreshToken){
+void TCPClient::setUser(QString nickname, QString accessToken, QString refreshToken){
+    this->nickname = nickname;
     this->accessToken = accessToken;
     this->refreshToken = refreshToken;
 }
@@ -116,6 +117,7 @@ void TCPClient::controller(){
             tokenRefreshing();
         else if(response.value("Target").toString() == "Token refreshed"){
             accessToken = response.value("Access token").toString();
+            nickname = response.value("Nickname").toString();
             configFileUpdate();
             send(lastRequest);
         }
@@ -123,7 +125,8 @@ void TCPClient::controller(){
 }
 
 void TCPClient::ftpController(){
-    QByteArray receivedObject = serverSocket->readAll();
+    qDebug() << "Sos";
+    QByteArray receivedObject = ftpSocket->readAll();
 
     QJsonParseError error;
 

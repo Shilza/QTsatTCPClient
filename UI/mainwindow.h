@@ -25,6 +25,7 @@ private:
     MenuList *menuListWidget;
     BansHistory *bansHistory;
     GlobalChat *globalChat;
+    ClickableLabel *labelAttachmentSizeToLarge;
 
 public:
     explicit MainWindow(QWidget *parent = 0);

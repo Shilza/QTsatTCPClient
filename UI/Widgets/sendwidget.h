@@ -11,6 +11,7 @@
 #include <QBuffer>
 #include "Util/tcpclient.h"
 #include "Util/floodtimer.h"
+#include "Util/sizecounting.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "UI/Widgets/globaltextedit.h"
 #include "Config/def.h"
@@ -56,14 +57,14 @@ private:
 signals:
     void messageSended(QString);
     void imageReceived(QPixmap);
-    void affixToLarge();
+    void attachmentToLarge();
 
 private slots:
     void floodErrorHide();
     void updateTime();
     void showSymbolsCount();
     void send();
-    void imageReceivedRedirect(QPixmap image, QString extension);
+    void affixReceivedRedirect(QVariant affix, QString extension);
     void selectImage();
     void messageSended();
     void floodReceived(int);

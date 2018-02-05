@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     resize(MAINWINDOW_WIDTH, MAINWINDOW_HEIGHT);
 
-
     mainWidget = new QWidget(this);
     mainLayout = new QHBoxLayout(mainWidget);
 
@@ -19,6 +18,18 @@ MainWindow::MainWindow(QWidget *parent) :
     globalChat = new GlobalChat(stackOfWidgets);
 
     bansHistory = new BansHistory(stackOfWidgets);
+
+    labelAttachmentSizeToLarge = new ClickableLabel(mainWidget, false);
+    labelAttachmentSizeToLarge->close();
+    labelAttachmentSizeToLarge->setGeometry(MAINWINDOW_WIDTH/4, MAINWINDOW_HEIGHT/3, MAINWINDOW_WIDTH/2, MAINWINDOW_HEIGHT/3);
+    labelAttachmentSizeToLarge->setCursor(Qt::PointingHandCursor);
+    labelAttachmentSizeToLarge->setAlignment(Qt::AlignCenter);
+    labelAttachmentSizeToLarge->setText("Attachment size exceeds the allowable limit\n Maximum size: " + QString::number(MAX_AFFIX_SIZE/1024/1024) + "MB");
+    labelAttachmentSizeToLarge->setStyleSheet(QString("font-size: %1px;"
+                                         "background: rgba(0, 0, 0, 150);"
+                                         "color: white;"
+                                         "border: 0px;").arg((MAINWINDOW_WIDTH/660)*13));
+
 
     ImageView::getInstance().create(this);
 
@@ -36,7 +47,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(menuListWidget->getPreSettings(), SIGNAL(showBansHistory()), SLOT(showBansHistory()));
     connect(menuListWidget->getGlobalChatButton(), SIGNAL(released()), SLOT(goToGlobalChat()));
+    connect(globalChat->getSendWidget(), SIGNAL(attachmentToLarge()), labelAttachmentSizeToLarge, SLOT(show()));
+    connect(labelAttachmentSizeToLarge, SIGNAL(released()), labelAttachmentSizeToLarge, SLOT(close()));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(exit(bool)));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), labelAttachmentSizeToLarge, SLOT(close()));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadAffixDeny()), labelAttachmentSizeToLarge, SLOT(show()));
+
 }
 
 void MainWindow::start(uint time){

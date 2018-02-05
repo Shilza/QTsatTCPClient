@@ -30,6 +30,7 @@ private:
 
 private slots:
     void preSettingsMove();
+    void exit(bool isExit);
 
 };
 

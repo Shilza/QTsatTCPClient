@@ -46,7 +46,8 @@ SOURCES += \
     UI/Widgets/menulist.cpp \
     UI/Widgets/presettings.cpp \
     UI/Widgets/banshistory.cpp \
-    UI/Widgets/globalchat.cpp
+    UI/Widgets/globalchat.cpp \
+    Util/sizecount.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -65,7 +66,8 @@ HEADERS += \
     UI/Widgets/menulist.h \
     UI/Widgets/presettings.h \
     UI/Widgets/banshistory.h \
-    UI/Widgets/globalchat.h
+    UI/Widgets/globalchat.h \
+    Util/sizecounting.h
 
 FORMS += \
         UI/mainwindow.ui \

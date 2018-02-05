@@ -118,7 +118,8 @@ void GlobalChat::selectGlobalItem(QListWidgetItem *item){
 }
 
 void GlobalChat::sendMessage(QString message){
-    if(message == "")
+    qDebug() << message.simplified();
+    if(message.simplified() == " " || message.simplified() == "" || message == "")
         return;
 
     QJsonObject request;

@@ -33,7 +33,7 @@ void GlobalTextEdit::keyPressEvent(QKeyEvent *event){
 
         const QMimeData* mime = QApplication::clipboard()->mimeData();
         if(mime->hasImage()){
-            emit imageReceived(mime->imageData().value<QPixmap>(), "image");
+            emit imageReceived(mime->imageData().value<QVariant>(), "image");
             return;
         }
         else if(mime->hasText()){
@@ -83,7 +83,7 @@ void GlobalTextEdit::dropEvent(QDropEvent *e){
                 QPixmap image;
                 image.load(a.path().right(a.path().length()-1));
 
-                emit imageReceived(image, extension);
+                emit imageReceived(QVariant(image), extension);
                 QTextEdit::dropEvent(new QDropEvent(QPointF(0,0), Qt::IgnoreAction, &data, Qt::LeftButton, Qt::NoModifier));
                 break;
             }
