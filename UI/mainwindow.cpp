@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent) :
     stackOfWidgets->addWidget(bansHistory->getList());
     stackOfWidgets->setCurrentWidget(globalChat->getWidget());
 
-    connect(menuListWidget->getPreSettings(), SIGNAL(showBansHistory()), SLOT(showBansHistory()));
+    connect(menuListWidget->getButtonBansHistory(), SIGNAL(released()), SLOT(showBansHistory()));
     connect(menuListWidget->getGlobalChatButton(), SIGNAL(released()), SLOT(goToGlobalChat()));
     connect(globalChat->getSendWidget(), SIGNAL(attachmentToLarge()), labelAttachmentSizeToLarge, SLOT(show()));
     connect(labelAttachmentSizeToLarge, SIGNAL(released()), labelAttachmentSizeToLarge, SLOT(close()));
@@ -63,6 +63,11 @@ void MainWindow::start(uint time){
 }
 
 void MainWindow::showBansHistory(){
+    QJsonObject request;
+    request.insert("Target", "Bans history");
+    request.insert("Page", 0);
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
+
     stackOfWidgets->setCurrentWidget(bansHistory->getList());
     bansHistory->start();
 }

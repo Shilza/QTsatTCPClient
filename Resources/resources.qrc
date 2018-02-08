@@ -22,5 +22,6 @@
         <file>affixClose.png</file>
         <file>toolTipAffixClose.png</file>
         <file>originalSize.png</file>
+        <file>list.png</file>
     </qresource>
 </RCC>

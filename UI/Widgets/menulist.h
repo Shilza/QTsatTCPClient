@@ -13,8 +13,8 @@ class MenuList : public QWidget
 public:
     explicit MenuList(int height, QWidget *parent = nullptr);
     QWidget* getWidget();
-    PreSettings* getPreSettings() const;
-    QPushButton* getGlobalChatButton() const;
+    const QPushButton *getButtonBansHistory() const;
+    const QPushButton* getGlobalChatButton() const;
 
 private:
     QWidget *widget;
@@ -25,6 +25,7 @@ private:
     QPushButton *buttonPrivateMessages;
     QPushButton *buttonFriends;
     QPushButton *buttonPreSettings;
+    QPushButton *buttonBansHistory;
 
     PreSettings *preSettings;
 

@@ -43,9 +43,9 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
                               "border-top: 0px;");
 
     affixWidgetContainer->setLayout(affixLayout);
-    affixWidgetContainer->setMaximumHeight(100);
+    //affixWidgetContainer->setMaximumHeight(100);
     affixWidgetContainer->setMinimumHeight(19);
-    affixWidgetContainer->setFixedWidth(118);
+    affixWidgetContainer->setFixedWidth(120);
     affixWidgetContainer->move(150, 6);
     affixWidgetContainer->setContentsMargins(0,0,0,4);
     affixWidgetContainer->setStyleSheet("background: transparent;"

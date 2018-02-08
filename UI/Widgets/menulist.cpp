@@ -12,6 +12,7 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     buttonUserPage = new QPushButton(widget);
     buttonPrivateMessages = new QPushButton(widget);
     buttonFriends = new QPushButton(widget);
+    buttonBansHistory = new QPushButton(buttonGlobalChat);
 
     menuListLayout->setSpacing(0);
     menuListLayout->setContentsMargins(0, 4, 0, 3);
@@ -54,6 +55,19 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
 
     preSettings->move(1, widget->height());
 
+    buttonBansHistory->resize(12, 12);
+    buttonBansHistory->move(12, 10);
+    buttonBansHistory->setStyleSheet("QPushButton{"
+                                     "background: transparent;"
+                                     "border: 0px;"
+                                     "}"
+                                     "QToolTip{"
+                                     "color: black;"
+                                     "}");
+    buttonBansHistory->setIcon(QIcon(":/images/list.png"));
+    buttonBansHistory->setIconSize(buttonBansHistory->size());
+    buttonBansHistory->setToolTip("Bans history");
+
     connect(buttonPreSettings, SIGNAL(released()), SLOT(preSettingsMove()));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(exit(bool)));
 }
@@ -62,11 +76,11 @@ QWidget* MenuList::getWidget(){
     return widget;
 }
 
-PreSettings* MenuList::getPreSettings() const{
-    return preSettings;
+const QPushButton *MenuList::getButtonBansHistory() const{
+    return buttonBansHistory;
 }
 
-QPushButton* MenuList::getGlobalChatButton() const{
+const QPushButton *MenuList::getGlobalChatButton() const{
     return buttonGlobalChat;
 }
 
