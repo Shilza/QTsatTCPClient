@@ -1,5 +1,6 @@
 #ifndef GLOBALTEXTEDIT_H
 #define GLOBALTEXTEDIT_H
+
 #include <QTextEdit>
 #include <QKeyEvent>
 #include <QApplication>

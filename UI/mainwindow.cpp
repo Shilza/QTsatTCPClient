@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -29,7 +30,6 @@ MainWindow::MainWindow(QWidget *parent) :
                                          "background: rgba(0, 0, 0, 150);"
                                          "color: white;"
                                          "border: 0px;").arg((MAINWINDOW_WIDTH/660)*13));
-
 
     ImageView::getInstance().create(this);
 
@@ -73,11 +73,13 @@ void MainWindow::showBansHistory(){
 }
 
 void MainWindow::goToGlobalChat(){
-    stackOfWidgets->setCurrentWidget(globalChat->getWidget());
-    QJsonObject request;
-    request.insert("Target", "Location");
-    request.insert("Value", "Global chat");
-    TCPClient::getInstance().send(QJsonDocument(request).toJson());
+    if(stackOfWidgets->currentWidget() != globalChat->getWidget()){
+        stackOfWidgets->setCurrentWidget(globalChat->getWidget());
+        QJsonObject request;
+        request.insert("Target", "Location");
+        request.insert("Value", "Global chat");
+        TCPClient::getInstance().send(QJsonDocument(request).toJson());
+    }
 }
 
 void MainWindow::exit(bool isExit){

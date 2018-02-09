@@ -1,7 +1,6 @@
 #ifndef GLOBALCHAT_H
 #define GLOBALCHAT_H
 
-#include <QWidget>
 #include <QGridLayout>
 #include <QListWidget>
 #include "UI/Widgets/wraplabel.h"

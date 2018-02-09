@@ -1,6 +1,6 @@
 #ifndef TCPCLIENT_H
 #define TCPCLIENT_H
-#include <QObject>
+
 #include <QFile>
 #include <QTcpSocket>
 #include <QHostAddress>
@@ -37,6 +37,7 @@ public:
     void sendToFTP(QJsonObject request);
     void sendToFTP(QByteArray attachment);
     void setUser(QString nickname, QString accessToken, QString refreshToken);
+    QString getNickname() const;
 
 signals:
     void updating();

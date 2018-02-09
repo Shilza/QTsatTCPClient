@@ -1,5 +1,6 @@
 #ifndef CLICKABLELABEL_H
 #define CLICKABLELABEL_H
+
 #include <QLabel>
 
 class ClickableLabel : public QLabel

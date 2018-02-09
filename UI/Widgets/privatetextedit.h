@@ -1,5 +1,6 @@
 #ifndef PRIVATETEXTEDIT_H
 #define PRIVATETEXTEDIT_H
+
 #include <QTextEdit>
 #include <QAbstractTextDocumentLayout>
 #include <QKeyEvent>

@@ -1,5 +1,6 @@
 #ifndef SENDWIDGET_H
 #define SENDWIDGET_H
+
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>

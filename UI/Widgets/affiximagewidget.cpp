@@ -2,6 +2,7 @@
 
 AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     close();
+
     mainWidget = new QWidget(parent);
     mainAffixLayout = new QHBoxLayout(mainWidget);
     mainAffixLayout->setMargin(5);

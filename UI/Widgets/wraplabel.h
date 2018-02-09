@@ -1,5 +1,6 @@
 #ifndef WRAPLABEL_H
 #define WRAPLABEL_H
+
 #include <QLabel>
 #include <QKeyEvent>
 #include <QApplication>

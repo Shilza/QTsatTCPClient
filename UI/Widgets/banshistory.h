@@ -1,13 +1,13 @@
 #ifndef BANSHISTORY_H
 #define BANSHISTORY_H
 
-#include <QObject>
 #include <QListWidget>
 #include <QSvgWidget>
 #include <QGridLayout>
 #include <QLabel>
 #include <QScrollBar>
 #include <QDateTime>
+#include <QPushButton>
 #include "Config/def.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "Util/tcpclient.h"

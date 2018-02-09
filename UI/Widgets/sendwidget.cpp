@@ -2,6 +2,7 @@
 
 SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     close();
+
     mainWidget = new QWidget(this);
     sendLayout = new QGridLayout(mainWidget);
 
@@ -27,7 +28,6 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     labelTimerShow = new QLabel(textMessage);
     labelSymbolsCount = new QLabel(textMessage);
 
-
     banTimer = new QTimer(this);
     banTimer->setSingleShot(true);
 
@@ -43,7 +43,6 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
                               "border-top: 0px;");
 
     affixWidgetContainer->setLayout(affixLayout);
-    //affixWidgetContainer->setMaximumHeight(100);
     affixWidgetContainer->setMinimumHeight(19);
     affixWidgetContainer->setFixedWidth(120);
     affixWidgetContainer->move(150, 6);
@@ -70,6 +69,11 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     buttonVideos->setIconSize(QSize(15,15));
     buttonAudios->setIconSize(QSize(15,15));
     buttonDocuments->setIconSize(QSize(15,15));
+
+    buttonPhotos->setCursor(Qt::PointingHandCursor);
+    buttonVideos->setCursor(Qt::PointingHandCursor);
+    buttonAudios->setCursor(Qt::PointingHandCursor);
+    buttonDocuments->setCursor(Qt::PointingHandCursor);
 
     affixLayout->setMargin(0);
     affixLayout->setSpacing(8);
@@ -138,10 +142,17 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     buttonSend->setText("Send");
     buttonSend->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
-    buttonSend->setStyleSheet("background: transparent;"
+    buttonSend->setStyleSheet("QPushButton{"
+                              "background: transparent;"
                               "border: 2px solid black;"
                               "border-radius: 10px;"
-                              "color: black;");
+                              "color: black;}"
+                              "QPushButton:hover{"
+                              "background: #CBE2E2;"
+                              "}"
+                              "QPushButton:focus:pressed{"
+                              "background: #A4CCCC;"
+                              "}");
 
     sendLayout->setContentsMargins(7,5,7,5);
     sendLayout->setVerticalSpacing(5);
@@ -168,9 +179,9 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
                                    "border: 0px;");
     labelFloodError->close();
 
-
     fontGothic.setBold(true);
     fontGothic.setPointSize(16);
+
     labelBan->setFont(fontGothic);
     labelBan->setAlignment(Qt::AlignCenter);
     labelBan->setText("Ban");
@@ -312,28 +323,6 @@ void SendWidget::decrementing(){
         countOfAttachment--;
 }
 
-SendWidget::~SendWidget(){
-    delete affixWidgetContainer;
-    delete subAffixWidget;
-    delete affixLayout;
-    delete labelBicycle;
-    delete buttonAffix;
-    delete textMessage;
-    delete buttonSend;
-    delete labelFloodError;
-    delete labelBan;
-    delete labelTimerShow;
-    delete labelSymbolsCount;
-    delete sendLayout;
-
-    delete buttonPhotos;
-    delete buttonVideos;
-    delete buttonAudios;
-    delete buttonDocuments;
-
-    delete floodTimer;
-}
-
 void SendWidget::ban(uint time){
     textMessage->clear();
     QLocale locale = QLocale(QLocale::English);
@@ -395,4 +384,26 @@ bool SendWidget::eventFilter(QObject *target, QEvent *event){
     }
 
     return QWidget::eventFilter(target, event);
+}
+
+SendWidget::~SendWidget(){
+    delete affixWidgetContainer;
+    delete subAffixWidget;
+    delete affixLayout;
+    delete labelBicycle;
+    delete buttonAffix;
+    delete textMessage;
+    delete buttonSend;
+    delete labelFloodError;
+    delete labelBan;
+    delete labelTimerShow;
+    delete labelSymbolsCount;
+    delete sendLayout;
+
+    delete buttonPhotos;
+    delete buttonVideos;
+    delete buttonAudios;
+    delete buttonDocuments;
+
+    delete floodTimer;
 }

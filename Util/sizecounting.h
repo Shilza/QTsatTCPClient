@@ -1,5 +1,6 @@
 #ifndef SIZECOUNTING_H
 #define SIZECOUNTING_H
+
 #include <QPixmap>
 #include <QBuffer>
 

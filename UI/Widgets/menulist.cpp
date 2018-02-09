@@ -1,5 +1,4 @@
 #include "menulist.h"
-#include <QDebug>
 
 MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     close();
@@ -13,6 +12,12 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     buttonPrivateMessages = new QPushButton(widget);
     buttonFriends = new QPushButton(widget);
     buttonBansHistory = new QPushButton(buttonGlobalChat);
+    buttonSettings = new QPushButton(widget);
+    accountWidget = new AccountWidget(widget, buttonUserPage);
+    temp = new QPushButton(widget);
+
+    temp->setMaximumSize(1000, 1000);
+    temp->setStyleSheet("background: transparent;");
 
     menuListLayout->setSpacing(0);
     menuListLayout->setContentsMargins(0, 4, 0, 3);
@@ -20,18 +25,14 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     menuListLayout->addWidget(buttonGlobalChat, 0, Qt::AlignTop);
     menuListLayout->addWidget(buttonFriends, 0, Qt::AlignTop);
     menuListLayout->addWidget(buttonPrivateMessages, 0, Qt::AlignTop);
-    menuListLayout->addWidget(new QWidget(widget), 6);
-
-    preSettings = new PreSettings(widget);
-    buttonPreSettings = new QPushButton(widget);
-
-    menuListLayout->addWidget(buttonPreSettings, 1);
-
-    buttonPreSettings->setFixedSize(120, 15);
+    menuListLayout->addWidget(buttonSettings, 0, Qt::AlignTop);
+    menuListLayout->addWidget(temp, 6);
 
     buttonUserPage->setFixedSize(50, 50);
     buttonUserPage->setStyleSheet("background: black;"
                                   "border-radius: 25px;");
+    buttonUserPage->setCursor(Qt::PointingHandCursor);
+    buttonUserPage->installEventFilter(accountWidget);
 
     QString buttonDefaultStyle = "QPushButton{"
                                  "background: transparent;"
@@ -53,10 +54,7 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     buttonGlobalChat->setStyleSheet(buttonDefaultStyle);
     buttonGlobalChat->setText("Global chat");
 
-    preSettings->move(1, widget->height());
-
-    buttonBansHistory->resize(12, 12);
-    buttonBansHistory->move(12, 10);
+    buttonBansHistory->setGeometry(12, 10, 12, 12);
     buttonBansHistory->setStyleSheet("QPushButton{"
                                      "background: transparent;"
                                      "border: 0px;"
@@ -68,8 +66,11 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     buttonBansHistory->setIconSize(buttonBansHistory->size());
     buttonBansHistory->setToolTip("Bans history");
 
-    connect(buttonPreSettings, SIGNAL(released()), SLOT(preSettingsMove()));
-    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(exit(bool)));
+    buttonSettings->setFixedSize(120, 30);
+    buttonSettings->setStyleSheet(buttonDefaultStyle);
+    buttonSettings->setText("Settings");
+
+    connect(buttonUserPage, SIGNAL(released()), accountWidget, SLOT(widgetShow()));
 }
 
 QWidget* MenuList::getWidget(){
@@ -82,18 +83,4 @@ const QPushButton *MenuList::getButtonBansHistory() const{
 
 const QPushButton *MenuList::getGlobalChatButton() const{
     return buttonGlobalChat;
-}
-
-void MenuList::preSettingsMove(){
-    static bool isShown = false;
-    QPropertyAnimation *animation = new QPropertyAnimation(preSettings, "pos");
-    animation->setEndValue(QPoint(1, isShown ? widget->height() : widget->height() - buttonPreSettings->height() - preSettings->getWidget()->height() - 5));
-    animation->setDuration(300);
-    animation->start(QAbstractAnimation::DeleteWhenStopped);
-    isShown = !isShown;
-}
-
-void MenuList::exit(bool isExit){
-    if(isExit)
-        preSettingsMove();
 }

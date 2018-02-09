@@ -62,6 +62,10 @@ void TCPClient::setUser(QString nickname, QString accessToken, QString refreshTo
     this->refreshToken = refreshToken;
 }
 
+QString TCPClient::getNickname() const{
+    return nickname;
+}
+
 void TCPClient::controller(){
     QByteArray receivedObject = serverSocket->readAll();
 

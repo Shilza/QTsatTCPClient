@@ -1,5 +1,6 @@
 #ifndef FLOODTIMER_H
 #define FLOODTIMER_H
+
 #include <QWidget>
 #include <QTimer>
 

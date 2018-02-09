@@ -5,7 +5,7 @@
 #include <QVBoxLayout>
 #include <QPushButton>
 #include <QPropertyAnimation>
-#include "UI/Widgets/presettings.h"
+#include "Ui/Widgets/accountwidget.h"
 
 class MenuList : public QWidget
 {
@@ -24,15 +24,10 @@ private:
     QPushButton *buttonUserPage;
     QPushButton *buttonPrivateMessages;
     QPushButton *buttonFriends;
-    QPushButton *buttonPreSettings;
     QPushButton *buttonBansHistory;
-
-    PreSettings *preSettings;
-
-private slots:
-    void preSettingsMove();
-    void exit(bool isExit);
-
+    QPushButton *buttonSettings;
+    AccountWidget *accountWidget;
+    QPushButton *temp;
 };
 
 #endif // MENULIST_H

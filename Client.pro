@@ -44,10 +44,10 @@ SOURCES += \
     UI/Widgets/imageview.cpp \
     Util/tcpclient.cpp \
     UI/Widgets/menulist.cpp \
-    UI/Widgets/presettings.cpp \
     UI/Widgets/banshistory.cpp \
     UI/Widgets/globalchat.cpp \
-    Util/sizecounting.cpp
+    Util/sizecounting.cpp \
+    UI/Widgets/accountwidget.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -63,11 +63,11 @@ HEADERS += \
     UI/Widgets/imageview.h \
     Util/tcpclient.h \
     UI/Widgets/menulist.h \
-    UI/Widgets/presettings.h \
     UI/Widgets/banshistory.h \
     UI/Widgets/globalchat.h \
     Util/sizecounting.h \
-    UI/Widgets/AffixImagewidget.h
+    UI/Widgets/AffixImagewidget.h \
+    UI/Widgets/accountwidget.h
 
 FORMS += \
         UI/mainwindow.ui \

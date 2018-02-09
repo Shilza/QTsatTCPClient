@@ -1,9 +1,10 @@
 #ifndef AFFIXIMAGEWIDGET_H
 #define AFFIXIMAGEWIDGET_H
-#include <QPushButton>
+
 #include <QEvent>
-#include <QHBoxLayout>
 #include <QBuffer>
+#include <QHBoxLayout>
+#include <QPushButton>
 #include "UI/Widgets/clickablelabel.h"
 #include "Util/tcpclient.h"
 
