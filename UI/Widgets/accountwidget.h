@@ -11,12 +11,12 @@ class AccountWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AccountWidget(QWidget *parent, void *buttonUserPagePtr);
+    explicit AccountWidget(QWidget *parent, QPushButton *buttonUserPagePtr);
     const QWidget *getWidget() const;
 
 private:
     bool isWidgetClosed = true;
-    void *buttonUserPagePtr;
+    QPushButton *buttonUserPagePtr;
 
     QWidget *mainWidget;
     QVBoxLayout *mainLayout;
@@ -25,6 +25,8 @@ private:
     QPushButton *buttonExit;
     bool eventFilter(QObject *watched, QEvent *event);
 
+signals:
+    void lostFocus();
 public slots:
     void widgetShow();
 

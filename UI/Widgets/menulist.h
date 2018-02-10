@@ -17,7 +17,7 @@ public:
     const QPushButton* getGlobalChatButton() const;
 
 private:
-    QWidget *widget;
+    QWidget *mainWidget;
     QVBoxLayout *menuListLayout;
 
     QPushButton *buttonGlobalChat;
@@ -28,6 +28,10 @@ private:
     QPushButton *buttonSettings;
     AccountWidget *accountWidget;
     QPushButton *temp;
+    QPushButton *widgetOverlappingUserPage;
+private slots:
+    void overlapping();
+    void unoverlapping();
 };
 
 #endif // MENULIST_H

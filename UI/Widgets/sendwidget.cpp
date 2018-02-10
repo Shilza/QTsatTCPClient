@@ -7,19 +7,11 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     sendLayout = new QGridLayout(mainWidget);
 
     textMessage = new GlobalTextEdit(mainWidget);
-    subAffixWidget = new QWidget(mainWidget);
-    affixWidgetContainer = new QPushButton(subAffixWidget);
-    affixLayout = new QHBoxLayout(affixWidgetContainer);
-
-    buttonPhotos = new QPushButton(affixWidgetContainer);
-    buttonVideos = new QPushButton(affixWidgetContainer);
-    buttonAudios = new QPushButton(affixWidgetContainer);
-    buttonDocuments = new QPushButton(affixWidgetContainer);
+    affixContainer = new AffixContainer(mainWidget);
 
     labelBicycle = new QLabel(mainWidget);
     buttonSend = new QPushButton(mainWidget);
 
-    buttonAffix = new QPushButton(mainWidget);
     labelFloodError = new ClickableLabel(textMessage, false);
     labelBan = new QLabel(textMessage);
 
@@ -31,9 +23,6 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     banTimer = new QTimer(this);
     banTimer->setSingleShot(true);
 
-    subAffixWidget->setStyleSheet("background: transparent;"
-                                  "border: 0px;");
-
     labelBicycle->setStyleSheet("background: #E5F0F0;"
                                 "border: 0px;");
 
@@ -41,47 +30,6 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     mainWidget->setStyleSheet("background: #E5F0F0;"
                               "border: 1px solid gray;"
                               "border-top: 0px;");
-
-    affixWidgetContainer->setLayout(affixLayout);
-    affixWidgetContainer->setMinimumHeight(19);
-    affixWidgetContainer->setFixedWidth(120);
-    affixWidgetContainer->move(150, 6);
-    affixWidgetContainer->setContentsMargins(0,0,0,4);
-    affixWidgetContainer->setStyleSheet("background: transparent;"
-                                        "border-bottom: 1px solid black;");
-
-    buttonDocuments->setIcon(QIcon(":/images/documentsGray"));
-    buttonAudios->setIcon(QIcon(":/images/audiosGray.png"));
-    buttonVideos->setIcon(QIcon(":/images/videosGray.png"));
-    buttonPhotos->setIcon(QIcon(":/images/photosGray.png"));
-
-    buttonPhotos->setFixedSize(15, 15);
-    buttonVideos->setFixedSize(15, 15);
-    buttonAudios->setFixedSize(15, 15);
-    buttonDocuments->setFixedSize(15, 15);
-
-    buttonPhotos->setStyleSheet("border: 0px;");
-    buttonVideos->setStyleSheet("border: 0px;");
-    buttonAudios->setStyleSheet("border: 0px;");
-    buttonDocuments->setStyleSheet("border: 0px;");
-
-    buttonPhotos->setIconSize(QSize(15,15));
-    buttonVideos->setIconSize(QSize(15,15));
-    buttonAudios->setIconSize(QSize(15,15));
-    buttonDocuments->setIconSize(QSize(15,15));
-
-    buttonPhotos->setCursor(Qt::PointingHandCursor);
-    buttonVideos->setCursor(Qt::PointingHandCursor);
-    buttonAudios->setCursor(Qt::PointingHandCursor);
-    buttonDocuments->setCursor(Qt::PointingHandCursor);
-
-    affixLayout->setMargin(0);
-    affixLayout->setSpacing(8);
-
-    affixLayout->addWidget(buttonDocuments, 1, Qt::AlignVCenter);
-    affixLayout->addWidget(buttonVideos, 1, Qt::AlignVCenter);
-    affixLayout->addWidget(buttonAudios, 1, Qt::AlignVCenter);
-    affixLayout->addWidget(buttonPhotos, 1, Qt::AlignVCenter);
 
     labelTimerShow->setAlignment(Qt::AlignCenter);
     labelTimerShow->setFont(QFont("Times New Roman", 11));
@@ -97,13 +45,6 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     labelSymbolsCount->setStyleSheet("background: transparent;"
                                      "border: 0px;");
     labelSymbolsCount->close();
-
-
-    buttonAffix->setFixedSize(15,20);
-    buttonAffix->setIcon(QIcon(":images/affix30.png"));
-    buttonAffix->setIconSize(QSize(15,20));
-    buttonAffix->setStyleSheet("background: transparent;"
-                               "border: 0px;");
 
     textMessage->setFixedHeight(50);
     textMessage->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -165,8 +106,8 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     sendLayout->addWidget(labelBan,          0, 0, 1, 8);
     sendLayout->addWidget(labelBicycle,      1, 7, -1, -1);
     sendLayout->addWidget(buttonSend,        1, 8, 1, 1);
-    sendLayout->addWidget(buttonAffix,       1, 7, 1, 1);
-    sendLayout->addWidget(subAffixWidget,    1, 4, -1, -1);
+    sendLayout->addWidget(affixContainer->getButtonAffix(), 1, 7, 1, 1);
+    sendLayout->addWidget(affixContainer, 1, 4, -1, -1);
 
     QFont fontGothic("Century Gothic");
     fontGothic.setBold(true);
@@ -190,27 +131,19 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
                             "border: 0px;");
     labelBan->close();
 
-    buttonAffix->installEventFilter(this);
-    affixWidgetContainer->installEventFilter(this);
-    buttonPhotos->installEventFilter(this);
-    buttonVideos->installEventFilter(this);
-    buttonAudios->installEventFilter(this);
-    buttonDocuments->installEventFilter(this);
-
     connect(buttonSend, SIGNAL(released()), SLOT(send()));
     connect(textMessage, SIGNAL(enter()), SLOT(send()));
     connect(textMessage, SIGNAL(textChanged()), SLOT(showSymbolsCount()));
     connect(floodTimer, SIGNAL(errorTimeout()), SLOT(floodErrorHide()));
     connect(floodTimer, SIGNAL(showTimeout()), SLOT(updateTime()));
     connect(textMessage, SIGNAL(imageReceived(QVariant, QString)), SLOT(affixReceivedRedirect(QVariant, QString)));
-    connect(buttonPhotos, SIGNAL(released()), SLOT(selectImage()));
+    connect(affixContainer, SIGNAL(pictureIsComing(QVariant,QString)), SLOT(affixReceivedRedirect(QVariant,QString)));
+    connect(banTimer, SIGNAL(timeout()), SLOT(banFinished()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(flood(int)), SLOT(floodReceived(int)));
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(messageSended()));
     connect(&(TCPClient::getInstance()), SIGNAL(banFinished(bool)), SLOT(banFinishing(bool)));
     connect(&(TCPClient::getInstance()), SIGNAL(banStarted(uint)), SLOT(ban(uint)));
-
-    connect(banTimer, SIGNAL(timeout()), SLOT(banFinished()));
 }
 
 void SendWidget::floodErrorHide(){
@@ -218,7 +151,7 @@ void SendWidget::floodErrorHide(){
     labelTimerShow->close();
     textMessage->setEnabled(true);
     buttonSend->setEnabled(true);
-    buttonAffix->setEnabled(true);
+    affixContainer->getButtonAffix()->setEnabled(true);
     textMessage->setFocus();
 }
 
@@ -279,16 +212,6 @@ void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
     }
 }
 
-void SendWidget::selectImage(){
-    static QString lastPath = QDir::homePath();
-    QString temp = QFileDialog::getOpenFileName(this, QObject::tr("Choose an image"), lastPath, QObject::tr("Image file (*.png *.jpg *.jpeg *.jpe *.bmp);;Все файлы (*.*)"));
-    if(temp != ""){
-        affixReceivedRedirect(QVariant(QPixmap(temp)), temp.split('.').back());
-        lastPath = temp;
-    }
-
-}
-
 void SendWidget::messageSended(){
     textMessage->clear();
 }
@@ -341,57 +264,9 @@ GlobalTextEdit *SendWidget::getTextMessage(){
     return textMessage;
 }
 
-bool SendWidget::eventFilter(QObject *target, QEvent *event){
-    if((target == buttonAffix || target == affixWidgetContainer) && buttonAffix->isEnabled()){
-        if (event->type() == QEvent::HoverEnter){
-            buttonAffix->setIcon(QIcon(":/images/affix30gray.png"));
-            QPropertyAnimation *animation = new QPropertyAnimation(affixWidgetContainer, "pos");
-            animation->setEndValue(QPoint(30, 6));
-            animation->setDuration(200);
-            animation->start(QAbstractAnimation::DeleteWhenStopped);
-        }
-        else if (event->type() == QEvent::HoverLeave){
-            buttonAffix->setIcon(QIcon(":/images/affix30.png"));
-            QPropertyAnimation *animation = new QPropertyAnimation(affixWidgetContainer, "pos");
-            animation->setEndValue(QPoint(150, 6));
-            animation->setDuration(200);
-            animation->start(QAbstractAnimation::DeleteWhenStopped);
-        }
-    }
-    else if(target == buttonPhotos){
-        if(event->type() == QEvent::HoverEnter)
-            buttonPhotos->setIcon(QIcon(":/images/photos.png"));
-        else if(event->type() == QEvent::HoverLeave)
-            buttonPhotos->setIcon(QIcon(":/images/photosGray.png"));
-    }
-    else if(target == buttonAudios){
-        if(event->type() == QEvent::HoverEnter)
-            buttonAudios->setIcon(QIcon(":/images/audios.png"));
-        else if(event->type() == QEvent::HoverLeave)
-            buttonAudios->setIcon(QIcon(":/images/audiosGray.png"));
-    }
-    else if(target == buttonVideos){
-        if(event->type() == QEvent::HoverEnter)
-            buttonVideos->setIcon(QIcon(":/images/videos.png"));
-        else if(event->type() == QEvent::HoverLeave)
-            buttonVideos->setIcon(QIcon(":/images/videosGray.png"));
-    }
-    else if(target == buttonDocuments){
-        if(event->type() == QEvent::HoverEnter)
-            buttonDocuments->setIcon(QIcon(":/images/documents.png"));
-        else if(event->type() == QEvent::HoverLeave)
-            buttonDocuments->setIcon(QIcon(":/images/documentsGray.png"));
-    }
-
-    return QWidget::eventFilter(target, event);
-}
-
 SendWidget::~SendWidget(){
-    delete affixWidgetContainer;
-    delete subAffixWidget;
-    delete affixLayout;
+    delete affixContainer;
     delete labelBicycle;
-    delete buttonAffix;
     delete textMessage;
     delete buttonSend;
     delete labelFloodError;
@@ -399,11 +274,6 @@ SendWidget::~SendWidget(){
     delete labelTimerShow;
     delete labelSymbolsCount;
     delete sendLayout;
-
-    delete buttonPhotos;
-    delete buttonVideos;
-    delete buttonAudios;
-    delete buttonDocuments;
 
     delete floodTimer;
 }

@@ -78,7 +78,8 @@ void GlobalChat::printMessages(QString strNickname, QString message, int time){
     timeOfMessage->setStyleSheet("color: #8A8A8A;");
 
     labelNickname->setText(strNickname);
-    labelNickname->setStyleSheet("color: #194A61;");
+    labelNickname->setStyleSheet("ClickableLabel{ color: #194A61;}"
+                                 "ClickableLabel:hover{ color: #5EBFED;}");
     labelNickname->setCursor(Qt::PointingHandCursor);
 
     avatar->setStyleSheet("background: black;"

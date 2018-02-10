@@ -5,8 +5,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QScrollBar>
-#include <QFileDialog>
-#include <QPropertyAnimation>
 #include <QDateTime>
 #include <QLocale>
 #include <QBuffer>
@@ -15,6 +13,7 @@
 #include "Util/sizecounting.h"
 #include "UI/Widgets/clickablelabel.h"
 #include "UI/Widgets/globaltextedit.h"
+#include "UI/Widgets/affixcontainer.h"
 #include "Config/def.h"
 
 class SendWidget : public QWidget
@@ -28,11 +27,10 @@ public:
 
 private:
     QWidget *mainWidget;
-    QPushButton *affixWidgetContainer;
-    QWidget *subAffixWidget;
-    QHBoxLayout *affixLayout;
+
+    AffixContainer *affixContainer;
+
     QLabel *labelBicycle;
-    QPushButton *buttonAffix;
     QPushButton *buttonSend;
     ClickableLabel *labelFloodError;
     QLabel *labelBan;
@@ -42,18 +40,11 @@ private:
 
     GlobalTextEdit *textMessage;
 
-    QPushButton *buttonPhotos;
-    QPushButton *buttonVideos;
-    QPushButton *buttonAudios;
-    QPushButton *buttonDocuments;
-
     FloodTimer *floodTimer;
     QTimer *banTimer;
 
     quint8 countOfAttachment=0;
     uint banFinish = 0;
-
-    bool eventFilter(QObject *target, QEvent *event);
 
 signals:
     void messageSended(QString);
@@ -66,7 +57,6 @@ private slots:
     void showSymbolsCount();
     void send();
     void affixReceivedRedirect(QVariant affix, QString extension);
-    void selectImage();
     void messageSended();
     void floodReceived(int);
     void banFinished();

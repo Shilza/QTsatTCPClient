@@ -2,19 +2,25 @@
 
 MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     close();
-    widget = new QWidget(this);
-    menuListLayout = new QVBoxLayout(widget);
-    widget->setLayout(menuListLayout);
-    widget->setFixedHeight(height);
+    mainWidget = new QWidget(this);
+    menuListLayout = new QVBoxLayout(mainWidget);
+    mainWidget->setLayout(menuListLayout);
+    mainWidget->setFixedHeight(height);
 
-    buttonGlobalChat = new QPushButton(widget);
-    buttonUserPage = new QPushButton(widget);
-    buttonPrivateMessages = new QPushButton(widget);
-    buttonFriends = new QPushButton(widget);
+    buttonGlobalChat = new QPushButton(mainWidget);
+    buttonUserPage = new QPushButton(mainWidget);
+    buttonPrivateMessages = new QPushButton(mainWidget);
+    buttonFriends = new QPushButton(mainWidget);
     buttonBansHistory = new QPushButton(buttonGlobalChat);
-    buttonSettings = new QPushButton(widget);
-    accountWidget = new AccountWidget(widget, buttonUserPage);
-    temp = new QPushButton(widget);
+    buttonSettings = new QPushButton(mainWidget);
+    accountWidget = new AccountWidget(mainWidget, buttonUserPage);
+    temp = new QPushButton(mainWidget);
+    widgetOverlappingUserPage = new QPushButton(mainWidget);
+
+    widgetOverlappingUserPage->setStyleSheet("background: transparent;");
+    widgetOverlappingUserPage->setFixedSize(120, 60);
+    widgetOverlappingUserPage->setCursor(Qt::PointingHandCursor);
+    widgetOverlappingUserPage->close();
 
     temp->setMaximumSize(1000, 1000);
     temp->setStyleSheet("background: transparent;");
@@ -71,10 +77,12 @@ MenuList::MenuList(int height, QWidget *parent) : QWidget(parent){
     buttonSettings->setText("Settings");
 
     connect(buttonUserPage, SIGNAL(released()), accountWidget, SLOT(widgetShow()));
+    connect(buttonUserPage, SIGNAL(released()), SLOT(overlapping()));
+    connect(accountWidget, SIGNAL(lostFocus()), SLOT(unoverlapping()));
 }
 
 QWidget* MenuList::getWidget(){
-    return widget;
+    return mainWidget;
 }
 
 const QPushButton *MenuList::getButtonBansHistory() const{
@@ -83,4 +91,12 @@ const QPushButton *MenuList::getButtonBansHistory() const{
 
 const QPushButton *MenuList::getGlobalChatButton() const{
     return buttonGlobalChat;
+}
+
+void MenuList::overlapping(){
+    widgetOverlappingUserPage->show();
+}
+
+void MenuList::unoverlapping(){
+    widgetOverlappingUserPage->close();
 }

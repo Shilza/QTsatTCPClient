@@ -1,7 +1,7 @@
 #include "accountwidget.h"
 #include <QDebug>
 
-AccountWidget::AccountWidget(QWidget *parent, void *buttonUserPagePtr) : QWidget(parent){
+AccountWidget::AccountWidget(QWidget *parent, QPushButton *buttonUserPagePtr) : QWidget(parent){
     close();
 
     this->buttonUserPagePtr = buttonUserPagePtr;
@@ -69,35 +69,21 @@ const QWidget *AccountWidget::getWidget() const{
     return mainWidget;
 }
 
-
-///////BIG BUG, DON'T USE ACCOUNT INFO(ACCOUNT WIDGET)
 bool AccountWidget::eventFilter(QObject *watched, QEvent *event){
-    static bool isLastClickButton = false;
-
-    if(watched == mainWidget){
+    if(watched == mainWidget)
         if(event->type() == QEvent::FocusOut && mainWidget->isVisible()){
-            if(isLastClickButton){
-               isWidgetClosed = false;
-            }
             mainWidget->close();
-            isLastClickButton = false;
+            emit lostFocus();
         }
-    }
-    else if(watched == buttonUserPagePtr)
-        if(event->type() == QEvent::MouseButtonPress){
-            isLastClickButton = true;
-        }
+
     return QWidget::eventFilter(watched, event);
 }
 
 void AccountWidget::widgetShow(){
-    if(isWidgetClosed){
-        if(buttonUser->text() == "")
-            buttonUser->setText(TCPClient::getInstance().getNickname());
-        mainWidget->setFocus();
-        mainWidget->show();
-    }
-    isWidgetClosed = true;
+    if(buttonUser->text() == "")
+        buttonUser->setText(TCPClient::getInstance().getNickname());
+    mainWidget->setFocus();
+    mainWidget->show();
 }
 
 void AccountWidget::exit(){

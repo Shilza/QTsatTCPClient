@@ -47,7 +47,8 @@ SOURCES += \
     UI/Widgets/banshistory.cpp \
     UI/Widgets/globalchat.cpp \
     Util/sizecounting.cpp \
-    UI/Widgets/accountwidget.cpp
+    UI/Widgets/accountwidget.cpp \
+    UI/Widgets/affixcontainer.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -67,7 +68,8 @@ HEADERS += \
     UI/Widgets/globalchat.h \
     Util/sizecounting.h \
     UI/Widgets/AffixImagewidget.h \
-    UI/Widgets/accountwidget.h
+    UI/Widgets/accountwidget.h \
+    UI/Widgets/affixcontainer.h
 
 FORMS += \
         UI/mainwindow.ui \
