@@ -3,8 +3,11 @@
 
 #include <QEvent>
 #include <QBuffer>
+#include <QTimer>
 #include <QHBoxLayout>
 #include <QPushButton>
+#include <QPropertyAnimation>
+#include <QGraphicsOpacityEffect>
 #include "UI/Widgets/clickablelabel.h"
 #include "Util/tcpclient.h"
 
@@ -22,7 +25,9 @@ private:
     QPushButton *buttonCloseAffixedPicture;
     QPushButton *toolTipAffixClose;
     QPushButton *originalSize;
+    QPushButton *buttonOk;
     ClickableLabel *labelLoadError;
+    QGraphicsOpacityEffect *opacity;
     QPixmap affixImage;
     QString extension;
 
@@ -44,6 +49,9 @@ private slots:
     void buttonCloseAffixedPicture_released();
     void affixError();
     void affixAllow();
+    void showButtonOk();
+    void hideButtonOk();
+    void clearing();
 };
 
 #endif // AFFIXIMAGEWIDGET_H

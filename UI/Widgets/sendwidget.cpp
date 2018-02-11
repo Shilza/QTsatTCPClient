@@ -144,6 +144,7 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(messageSended()));
     connect(&(TCPClient::getInstance()), SIGNAL(banFinished(bool)), SLOT(banFinishing(bool)));
     connect(&(TCPClient::getInstance()), SIGNAL(banStarted(uint)), SLOT(ban(uint)));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadingIsFinished(QString)), SLOT(setReference(QString)));
 }
 
 void SendWidget::floodErrorHide(){
@@ -177,7 +178,20 @@ void SendWidget::showSymbolsCount(){
 }
 
 void SendWidget::send(){
-    emit messageSended(textMessage->toPlainText());
+    QString message = textMessage->toPlainText();
+    if(message.simplified() == " " || message.simplified() == "" || message == "")
+        return;
+
+    QJsonObject request;
+
+    request.insert("Target", "GMessage");
+    request.insert("Message", message);
+
+    if(countOfAttachment==1){
+        request.insert("Attachment", attachmentReference);
+    }
+
+    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
@@ -204,7 +218,7 @@ void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
         QJsonObject request;
         request.insert("Target", "Post");
         request.insert("Extension", extension);
-        request.insert("Location", "Global chat");
+        request.insert("Location", "GlobalChat");
         request.insert("Size", size);
         TCPClient::getInstance().sendToFTP(request);
 
@@ -214,6 +228,8 @@ void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
 
 void SendWidget::messageSended(){
     textMessage->clear();
+    attachmentReference = "";
+    countOfAttachment = 0;
 }
 
 void SendWidget::floodReceived(int time){
@@ -239,6 +255,10 @@ void SendWidget::banFinishing(bool isFinished){
     }
     else
         banTimer->start(300000);
+}
+
+void SendWidget::setReference(QString reference){
+    attachmentReference = reference;
 }
 
 void SendWidget::decrementing(){

@@ -77,7 +77,7 @@ void MainWindow::goToGlobalChat(){
         stackOfWidgets->setCurrentWidget(globalChat->getWidget());
         QJsonObject request;
         request.insert("Target", "Location");
-        request.insert("Value", "Global chat");
+        request.insert("Value", "GlobalChat");
         TCPClient::getInstance().send(QJsonDocument(request).toJson());
     }
 }

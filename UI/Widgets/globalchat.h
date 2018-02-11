@@ -28,7 +28,6 @@ private:
 private slots:
     void printMessages(QString, QString, int);
     void selectGlobalItem(QListWidgetItem*);
-    void sendMessage(QString);
     void clearAll(bool);
 };
 

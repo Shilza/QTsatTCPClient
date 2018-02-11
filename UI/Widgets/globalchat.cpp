@@ -34,7 +34,6 @@ GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     globalChatLayout->addWidget(affixImageWidget->getSendedImage(), 6,0,2,9, Qt::AlignLeft | Qt::AlignBottom);
     globalChatLayout->addWidget(sendWidget->getMainWidget(), 8, 0, 2, 9);
 
-    connect(sendWidget, SIGNAL(messageSended(QString)), this, SLOT(sendMessage(QString)));
     connect(sendWidget, SIGNAL(imageReceived(QPixmap, QString)), affixImageWidget, SLOT(receivedImageTreatment(QPixmap, QString)));
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 
@@ -116,17 +115,6 @@ void GlobalChat::printMessages(QString strNickname, QString message, int time){
 
 void GlobalChat::selectGlobalItem(QListWidgetItem *item){
     listOfGlobalMessages->setItemSelected(item, true);
-}
-
-void GlobalChat::sendMessage(QString message){
-    if(message.simplified() == " " || message.simplified() == "" || message == "")
-        return;
-
-    QJsonObject request;
-
-    request.insert("Target", "GMessage");
-    request.insert("Message", message);
-    TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
 void GlobalChat::clearAll(bool){

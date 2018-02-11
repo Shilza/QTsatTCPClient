@@ -148,5 +148,9 @@ void TCPClient::ftpController(){
             else if(response.value("Value").toString() == "Allow")
                 emit loadAttachmentAllow();
         }
+        else if(response.value("Target").toString() == "Loading"){
+            if(response.value("Value").toInt() == 100)
+                emit loadingIsFinished(response.value("Reference").toString());
+        }
     }
 }

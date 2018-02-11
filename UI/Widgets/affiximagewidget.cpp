@@ -5,23 +5,29 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
 
     mainWidget = new QWidget(parent);
     mainAffixLayout = new QHBoxLayout(mainWidget);
-    mainAffixLayout->setMargin(5);
-    mainWidget->setLayout(mainAffixLayout);
-
     sendedImage = new QPushButton(mainWidget);
+    toolTipAffixClose = new QPushButton(parent);
+    originalSize = new QPushButton(sendedImage);
+    labelLoadError = new ClickableLabel(sendedImage, false);
+    buttonOk = new QPushButton(sendedImage);
+    buttonCloseAffixedPicture = new QPushButton(sendedImage);
+    opacity = new QGraphicsOpacityEffect(buttonOk);
+
     sendedImage->installEventFilter(this);
 
-    toolTipAffixClose = new QPushButton(parent);
-
-    originalSize = new QPushButton(sendedImage);
-
-    labelLoadError = new ClickableLabel(sendedImage, false);
-
-    buttonCloseAffixedPicture = new QPushButton(sendedImage);
+    mainAffixLayout->setMargin(5);
+    mainWidget->setLayout(mainAffixLayout);
 
     sendedImage->setFixedSize(sendedImageSize, sendedImageSize);
     sendedImage->setStyleSheet("border: 1px solid black;");
     sendedImage->close();
+
+    buttonOk->setFixedSize(sendedImage->size());
+    buttonOk->setStyleSheet("background: transparent;");
+    buttonOk->setIcon(QIcon(":/images/ok.png"));
+    buttonOk->setIconSize(buttonOk->size());
+    buttonOk->setGraphicsEffect(opacity);
+    buttonOk->close();
 
     originalSize->resize(sendedImage->width(), sendedImage->width());
     originalSize->setIcon(QIcon(":/images/originalSize.png"));
@@ -58,6 +64,8 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(buttonCloseAffixedPicture_released()));
     connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentDeny()), SLOT(affixError()));
     connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentAllow()), SLOT(affixAllow()));
+    connect(&(TCPClient::getInstance()), SIGNAL(loadingIsFinished(QString)), SLOT(showButtonOk()));
+    connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(clearing()));
 }
 
 QWidget *AffixImageWidget::getSendedImage(){
@@ -94,8 +102,8 @@ void AffixImageWidget::buttonCloseAffixedPicture_released(){
     affixImage = QPixmap(); //cleaning
     labelLoadError->close();
     isLoadError = false;
-    emit detachmentImage();
     sendedImage->close();
+    emit detachmentImage();
 }
 
 void AffixImageWidget::affixError(){
@@ -111,6 +119,27 @@ void AffixImageWidget::affixAllow(){
     buffer.open(QIODevice::WriteOnly);
     affixImage.save(&buffer, extension.toStdString().c_str());
     TCPClient::getInstance().sendToFTP(attachment);
+}
+
+void AffixImageWidget::showButtonOk(){
+    buttonOk->show();
+    opacity->setOpacity(1.0);
+    QTimer::singleShot(1000, this, SLOT(hideButtonOk()));
+}
+
+void AffixImageWidget::hideButtonOk(){
+    QPropertyAnimation *animation = new QPropertyAnimation(opacity, "opacity");
+    animation->setDuration(2000);
+    animation->setEndValue(0.0);
+    animation->start(QAbstractAnimation::DeleteWhenStopped);
+    connect(animation, SIGNAL(finished()), buttonOk, SLOT(close()));
+}
+
+void AffixImageWidget::clearing(){
+    affixImage = QPixmap();
+    labelLoadError->close();
+    isLoadError = false;
+    sendedImage->close();
 }
 
 AffixImageWidget::~AffixImageWidget(){
@@ -131,7 +160,7 @@ bool AffixImageWidget::eventFilter(QObject *target, QEvent *event)
         else if(event->type() == QEvent::HoverLeave)
             toolTipAffixClose->close();
     }
-    else if(target==sendedImage && !isLoadError){
+    else if(target==sendedImage && !isLoadError && buttonOk->isHidden()){
         if(event->type() == QEvent::HoverEnter)
             originalSize->show();
         else if(event->type() == QEvent::HoverLeave)

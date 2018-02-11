@@ -45,9 +45,9 @@ private:
 
     quint8 countOfAttachment=0;
     uint banFinish = 0;
+    QString attachmentReference = "";
 
 signals:
-    void messageSended(QString);
     void imageReceived(QPixmap image, QString extension);
     void attachmentToLarge();
 
@@ -61,6 +61,7 @@ private slots:
     void floodReceived(int);
     void banFinished();
     void banFinishing(bool);
+    void setReference(QString reference);
 
 public slots:
     void decrementing();

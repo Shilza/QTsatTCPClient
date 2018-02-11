@@ -57,6 +57,7 @@ signals:
     void bansHistory(QJsonArray, bool);
     void loadAttachmentDeny();
     void loadAttachmentAllow();
+    void loadingIsFinished(QString reference);
 
 private slots:
     void controller();
