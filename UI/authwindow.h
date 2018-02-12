@@ -104,7 +104,7 @@ private:
     bool eventFilter(QObject *target, QEvent *event);
 
 public:
-    explicit AuthWindow(QMainWindow *parent = 0);
+    explicit AuthWindow(QMainWindow *parent = nullptr);
     void start(QString nickname, QString, QString);
     ~AuthWindow();
 

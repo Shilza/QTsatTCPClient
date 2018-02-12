@@ -20,9 +20,6 @@ private:
 
     TCPClient(QObject *parent = 0);
 
-    TCPClient(TCPClient const&) = delete;
-    TCPClient& operator= (TCPClient const&) = delete;
-
     QByteArray lastRequest;
     QString nickname;
     QString accessToken;
@@ -35,9 +32,13 @@ public:
     static TCPClient& getInstance();
     void send(QByteArray request);
     void sendToFTP(QJsonObject request);
-    void sendToFTP(QByteArray attachment);
+    void postToFTP(QByteArray attachment);
+    void getFromFTP(QString attachment);
     void setUser(QString nickname, QString accessToken, QString refreshToken);
     QString getNickname() const;
+
+    TCPClient(const TCPClient &) = delete;
+    TCPClient& operator= (const TCPClient &) = delete;
 
 signals:
     void updating();
@@ -49,7 +50,7 @@ signals:
     void recoveryCode(QString);
     void recoveryNewPass(QString);
     void messageSended();
-    void messageReceived(QString, QString, int);
+    void messageReceived(QString, QString, int, QString);
     void flood(int);
     void banFinished(bool);
     void banStarted(uint);
@@ -57,7 +58,8 @@ signals:
     void bansHistory(QJsonArray, bool);
     void loadAttachmentDeny();
     void loadAttachmentAllow();
-    void loadingIsFinished(QString reference);
+    void postIsFinished(QString reference);
+    void getIsFinished(QByteArray);
 
 private slots:
     void controller();

@@ -15,7 +15,7 @@ class AffixImageWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AffixImageWidget(QWidget *parent=0);
+    explicit AffixImageWidget(QWidget *parent = nullptr);
     QWidget *getSendedImage();
     ~AffixImageWidget();
 private:

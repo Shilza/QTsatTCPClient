@@ -26,7 +26,7 @@ private:
     AffixImageWidget *affixImageWidget;
 
 private slots:
-    void printMessages(QString, QString, int);
+    void printMessages(QString, QString, int, QString attachment);
     void selectGlobalItem(QListWidgetItem*);
     void clearAll(bool);
 };

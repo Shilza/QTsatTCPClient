@@ -1,4 +1,5 @@
 #include "globalchat.h"
+#include <QDebug>
 
 GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     close();
@@ -37,7 +38,7 @@ GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     connect(sendWidget, SIGNAL(imageReceived(QPixmap, QString)), affixImageWidget, SLOT(receivedImageTreatment(QPixmap, QString)));
     connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
 
-    connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString,QString, int)), SLOT(printMessages(QString, QString, int)));
+    connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString, QString, int, QString)), SLOT(printMessages(QString, QString, int, QString)));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(clearAll(bool)));
     connect(affixImageWidget, SIGNAL(originalSizeReleased(QPixmap)), &(ImageView::getInstance()), SLOT(setPicture(QPixmap)));
 }
@@ -50,7 +51,9 @@ SendWidget *GlobalChat::getSendWidget(){
     return sendWidget;
 }
 
-void GlobalChat::printMessages(QString strNickname, QString message, int time){
+void GlobalChat::printMessages(QString strNickname, QString message, int time, QString attachment){
+    if(attachment != ""){
+    }
     QWidget *widget = new QWidget(listOfGlobalMessages);
     QGridLayout *layout = new QGridLayout(widget);
     layout->setContentsMargins(2,5,5,5);
@@ -109,7 +112,6 @@ void GlobalChat::printMessages(QString strNickname, QString message, int time){
     item->setSizeHint(QSize(widget->width(), layout->sizeHint().height()));
 
     connect(textOfMessage, SIGNAL(select(QListWidgetItem*)), this, SLOT(selectGlobalItem(QListWidgetItem*)));
-
     listOfGlobalMessages->setItemWidget(item, widget);
 }
 

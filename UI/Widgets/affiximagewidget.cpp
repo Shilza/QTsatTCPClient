@@ -64,7 +64,7 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(buttonCloseAffixedPicture_released()));
     connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentDeny()), SLOT(affixError()));
     connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentAllow()), SLOT(affixAllow()));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadingIsFinished(QString)), SLOT(showButtonOk()));
+    connect(&(TCPClient::getInstance()), SIGNAL(postIsFinished(QString)), SLOT(showButtonOk()));
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(clearing()));
 }
 
@@ -118,7 +118,7 @@ void AffixImageWidget::affixAllow(){
     QBuffer buffer(&attachment);
     buffer.open(QIODevice::WriteOnly);
     affixImage.save(&buffer, extension.toStdString().c_str());
-    TCPClient::getInstance().sendToFTP(attachment);
+    TCPClient::getInstance().postToFTP(attachment);
 }
 
 void AffixImageWidget::showButtonOk(){

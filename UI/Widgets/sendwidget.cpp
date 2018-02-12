@@ -144,7 +144,7 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(messageSended()));
     connect(&(TCPClient::getInstance()), SIGNAL(banFinished(bool)), SLOT(banFinishing(bool)));
     connect(&(TCPClient::getInstance()), SIGNAL(banStarted(uint)), SLOT(ban(uint)));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadingIsFinished(QString)), SLOT(setReference(QString)));
+    connect(&(TCPClient::getInstance()), SIGNAL(postIsFinished(QString)), SLOT(setReference(QString)));
 }
 
 void SendWidget::floodErrorHide(){

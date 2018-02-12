@@ -48,7 +48,9 @@ SOURCES += \
     UI/Widgets/globalchat.cpp \
     Util/sizecounting.cpp \
     UI/Widgets/accountwidget.cpp \
-    UI/Widgets/affixcontainer.cpp
+    UI/Widgets/affixcontainer.cpp \
+    UI/Widgets/Attachments/attachment.cpp \
+    UI/Widgets/Attachments/image.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -69,7 +71,9 @@ HEADERS += \
     Util/sizecounting.h \
     UI/Widgets/AffixImagewidget.h \
     UI/Widgets/accountwidget.h \
-    UI/Widgets/affixcontainer.h
+    UI/Widgets/affixcontainer.h \
+    UI/Widgets/Attachments/attachment.h \
+    UI/Widgets/Attachments/image.h
 
 FORMS += \
         UI/mainwindow.ui \

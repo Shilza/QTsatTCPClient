@@ -51,9 +51,13 @@ void TCPClient::sendToFTP(QJsonObject request){
     ftpSocket->write(QJsonDocument(request).toJson());
 }
 
-void TCPClient::sendToFTP(QByteArray attachment){
+void TCPClient::postToFTP(QByteArray attachment){
     qDebug() << "Send attachment";
     ftpSocket->write(attachment);
+}
+
+void TCPClient::getFromFTP(QString attachment){
+
 }
 
 void TCPClient::setUser(QString nickname, QString accessToken, QString refreshToken){
@@ -106,8 +110,19 @@ void TCPClient::controller(){
             else if(response.value("Value").toString() == "Ban")
                 emit banStarted(response.value("Time").toInt());
         }
-        else if(response.value("Target").toString() == "Message delivery")
-            emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt());
+        else if(response.value("Target").toString() == "Message delivery"){
+            if(response.contains("Attachment")){
+
+                QJsonObject request;
+                request.insert("Target", "Get");
+                request.insert("Resource", response.value("Attachment").toString());
+                sendToFTP(request);
+
+                emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt(), response.value("Attachment").toString());
+            }
+            else
+                emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt(), "");
+        }
         else if(response.value("Target").toString() == "Ban finished")
             emit banFinished(response.value("Value") == "True");
         else if(response.value("Target").toString() == "Exit"){
@@ -150,7 +165,7 @@ void TCPClient::ftpController(){
         }
         else if(response.value("Target").toString() == "Loading"){
             if(response.value("Value").toInt() == 100)
-                emit loadingIsFinished(response.value("Reference").toString());
+                emit postIsFinished(response.value("Reference").toString());
         }
     }
 }
