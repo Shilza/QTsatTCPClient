@@ -11,13 +11,9 @@ int main(int argc, char *argv[])
     AuthWindow *authWindow = new AuthWindow;
 
     QFile configFile("config.txt");
-    if (!configFile.exists())
-        authWindow->show();
-    else{
-        if(!configFile.open(QIODevice::ReadOnly)){
+    if (configFile.exists()){
+        if(!configFile.open(QIODevice::ReadOnly))
             configFile.remove();
-            authWindow->show();
-        }
         else{
             QJsonObject configJson = QJsonDocument::fromJson(configFile.readAll()).object();
             authWindow->start(configJson.value("Nickname").toString(), configJson.value("Access token").toString(), configJson.value("Refresh token").toString());

@@ -315,7 +315,6 @@ void AuthWindow::start(QString nickname, QString accessToken, QString refreshTok
     labelAuthentication->setText("Authentication");
     labelAuthentication->show();
     timerAuthentication->start();
-    show();
 
     TCPClient::getInstance().setUser(nickname, accessToken, refreshToken);
     QJsonObject request;
@@ -598,6 +597,7 @@ void AuthWindow::authorizationReceived(QString value, uint time){
         emit errorHasOccured();
     }
     else if(value == "Authorization successful"){
+        close();
         lineLog->show();
         linePass->show();
         labelSignUp->show();
@@ -610,11 +610,10 @@ void AuthWindow::authorizationReceived(QString value, uint time){
         timerAuthentication->stop();
 
         gotoSignInLoc();
-        emit startMainWindow(time);
         cancelPreloading();
         errorHide();
         linePass->clear();
-        close();
+        emit startMainWindow(time);
     }
 }
 

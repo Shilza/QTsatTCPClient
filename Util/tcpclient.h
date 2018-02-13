@@ -59,7 +59,8 @@ signals:
     void loadAttachmentDeny();
     void loadAttachmentAllow();
     void postIsFinished(QString reference);
-    void getIsFinished(QByteArray);
+    void getting(QByteArray);
+    void sizeWasGotten(int);
 
 private slots:
     void controller();

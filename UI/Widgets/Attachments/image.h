@@ -8,7 +8,6 @@ class Image : public Attachment
 public:
     Image(QString extension, QWidget *parent = nullptr);
 private:
-    QPushButton *mini;
     QPixmap image;
     QString extension;
 

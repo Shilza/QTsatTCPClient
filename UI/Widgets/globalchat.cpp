@@ -51,25 +51,22 @@ SendWidget *GlobalChat::getSendWidget(){
     return sendWidget;
 }
 
-void GlobalChat::printMessages(QString strNickname, QString message, int time, QString attachment){
-    if(attachment != ""){
-    }
+void GlobalChat::printMessages(QString strNickname, QString message, int time, QString attchExtension){
+
     QWidget *widget = new QWidget(listOfGlobalMessages);
     QGridLayout *layout = new QGridLayout(widget);
+    QLabel *timeOfMessage = new QLabel(QDateTime::fromTime_t(time).time().toString(), widget);
+    QLabel *avatar = new QLabel(widget);
+    QWidget *nickname = new QWidget(widget);
+    QHBoxLayout *nicknameLayout = new QHBoxLayout(nickname);
+    ClickableLabel *labelNickname = new ClickableLabel(widget, false);
+    QWidget *widgetBicycle = new QWidget(nickname);
+
     layout->setContentsMargins(2,5,5,5);
     layout->setSpacing(0);
     layout->setHorizontalSpacing(5);
     layout->setVerticalSpacing(5);
     widget->setLayout(layout);
-
-    QLabel *timeOfMessage = new QLabel(QDateTime::fromTime_t(time).time().toString(), widget);
-    WrapLabel *textOfMessage = new WrapLabel(widget);
-    QLabel *avatar = new QLabel(widget);
-
-    QWidget *nickname = new QWidget(widget);
-    QHBoxLayout *nicknameLayout = new QHBoxLayout(nickname);
-    ClickableLabel *labelNickname = new ClickableLabel(widget, false);
-    QWidget *widgetBicycle = new QWidget(nickname);
 
     nickname->setLayout(nicknameLayout);
     nicknameLayout->setSpacing(0);
@@ -92,26 +89,35 @@ void GlobalChat::printMessages(QString strNickname, QString message, int time, Q
     labelNickname->setFixedHeight(10);
     timeOfMessage->setFixedHeight(10);
 
-    textOfMessage->setFixedWidth(450);
-    textOfMessage->setWordWrap(true);
-    textOfMessage->setStyleSheet("border: 0px;"
-                                 "background:transparent;");
-    textOfMessage->setTextInteractionFlags(textOfMessage->textInteractionFlags() | Qt::TextSelectableByMouse);
-    textOfMessage->wrapText(message);
-
     layout->addWidget(nickname, 0, 1, 1, 1);
     layout->addWidget(timeOfMessage, 0, 7, 1, 1, Qt::AlignRight);
-    layout->addWidget(textOfMessage, 1, 1, 2, 7, Qt::AlignLeft | Qt::AlignTop);
 
     QWidgetItem *widgetItem = new QWidgetItem(avatar);
-    widgetItem->setGeometry(QRect(0,0,30,30));
-    layout->addItem(widgetItem, 0,0,3,1, Qt::AlignTop);
+    widgetItem->setGeometry(QRect(0, 0, 30, 30));
+    layout->addItem(widgetItem, 0, 0, 3, 1, Qt::AlignTop);
 
     QListWidgetItem* item = new QListWidgetItem(listOfGlobalMessages);
-    textOfMessage->setItem(item);
-    item->setSizeHint(QSize(widget->width(), layout->sizeHint().height()));
 
-    connect(textOfMessage, SIGNAL(select(QListWidgetItem*)), this, SLOT(selectGlobalItem(QListWidgetItem*)));
+    if(message != ""){
+        WrapLabel *textOfMessage = new WrapLabel(widget);
+        textOfMessage->setFixedWidth(450);
+        textOfMessage->setWordWrap(true);
+        textOfMessage->setStyleSheet("border: 0px;"
+                                     "background:transparent;");
+        textOfMessage->setTextInteractionFlags(textOfMessage->textInteractionFlags() | Qt::TextSelectableByMouse);
+        textOfMessage->wrapText(message);
+        layout->addWidget(textOfMessage, 1, 1, 2, 7, Qt::AlignLeft | Qt::AlignTop);
+
+        textOfMessage->setItem(item);
+        connect(textOfMessage, SIGNAL(select(QListWidgetItem*)), this, SLOT(selectGlobalItem(QListWidgetItem*)));
+    }
+
+    if(attchExtension != ""){
+        Image *attachment = new Image(attchExtension, widget);
+        layout->addWidget(attachment->getMainFrame(), 3, 1, 1, 4, Qt::AlignLeft | Qt::AlignTop);
+    }
+
+    item->setSizeHint(QSize(widget->width(), layout->sizeHint().height()));
     listOfGlobalMessages->setItemWidget(item, widget);
 }
 

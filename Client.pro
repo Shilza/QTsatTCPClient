@@ -13,7 +13,7 @@ CONFIG   += c++11 console
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = QUdpSocket
+TARGET = QTsat
 TEMPLATE = app
 
 

@@ -7,6 +7,7 @@
 #include "UI/Widgets/sendwidget.h"
 #include "UI/Widgets/AffixImagewidget.h"
 #include "UI/Widgets/imageview.h"
+#include "UI/Widgets/Attachments/image.h"
 #include "Config/def.h"
 #include "Util/tcpclient.h"
 

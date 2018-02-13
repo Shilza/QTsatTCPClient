@@ -80,9 +80,7 @@ void TCPClient::controller(){
     if(error.error == QJsonParseError::NoError){
         if(response.value("Target").toString() == "Authorization"){
             if(response.contains("Access token")){
-                nickname = response.value("Nickname").toString();
-                accessToken = response.value("Access token").toString();
-                refreshToken = response.value("Refresh token").toString();
+                setUser(response.value("Nickname").toString(), response.value("Access token").toString(), response.value("Refresh token").toString());
 
                 configFileUpdate();
             }
@@ -115,13 +113,18 @@ void TCPClient::controller(){
 
                 QJsonObject request;
                 request.insert("Target", "Get");
-                request.insert("Resource", response.value("Attachment").toString());
+                request.insert("Reference", response.value("Attachment").toString());
                 sendToFTP(request);
 
-                emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt(), response.value("Attachment").toString());
+                emit messageReceived(response.value("Nickname").toString(),
+                                     response.value("Message").toString(),
+                                     response.value("Time").toInt(),
+                                     response.value("Attachment").toString().split('.').back());
             }
             else
-                emit messageReceived(response.value("Nickname").toString(), response.value("Message").toString(), response.value("Time").toInt(), "");
+                emit messageReceived(response.value("Nickname").toString(),
+                                     response.value("Message").toString(),
+                                     response.value("Time").toInt(), "");
         }
         else if(response.value("Target").toString() == "Ban finished")
             emit banFinished(response.value("Value") == "True");
@@ -129,9 +132,7 @@ void TCPClient::controller(){
             QFile configFile("config.txt");
             if(configFile.exists())
                 configFile.remove();
-            nickname = "";
-            accessToken = "";
-            refreshToken = "";
+            setUser(nickname, accessToken, refreshToken);
 
             emit exit(QJsonDocument::fromJson(lastRequest).object().value("Target").toString() == "Exit");
         }
@@ -167,5 +168,13 @@ void TCPClient::ftpController(){
             if(response.value("Value").toInt() == 100)
                 emit postIsFinished(response.value("Reference").toString());
         }
+        else if(response.value("Target").toString() == "Get"){
+            qDebug() << "Getttt" << response.value("SizeOfAttachment").toInt();
+            emit sizeWasGotten(response.value("SizeOfAttachment").toInt());
+        }
+    }
+    else{
+        qDebug() << "Getting";
+        emit getting(receivedObject);
     }
 }
