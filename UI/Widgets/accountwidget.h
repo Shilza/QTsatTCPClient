@@ -13,6 +13,7 @@ class AccountWidget : public QWidget
 public:
     explicit AccountWidget(QWidget *parent, QPushButton *buttonUserPagePtr);
     const QWidget *getWidget() const;
+    QPushButton *getButtonSettings() const;
 
 private:
     bool isWidgetClosed = true;
@@ -27,6 +28,7 @@ private:
 
 signals:
     void lostFocus();
+
 public slots:
     void widgetShow();
 

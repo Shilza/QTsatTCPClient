@@ -13,7 +13,7 @@
 class GlobalTextEdit : public QTextEdit{
     Q_OBJECT
 public:
-    explicit GlobalTextEdit(QWidget *parent=0);
+    explicit GlobalTextEdit(QWidget *parent = nullptr);
 
 private:
     void keyPressEvent(QKeyEvent *e);

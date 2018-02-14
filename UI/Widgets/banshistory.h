@@ -16,7 +16,7 @@ class BansHistory : public QWidget
 {
     Q_OBJECT
 public:
-    explicit BansHistory(QWidget* parent = 0);
+    explicit BansHistory(QWidget* parent = nullptr);
     QListWidget* getList();
     void start();
 

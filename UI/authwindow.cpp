@@ -1198,7 +1198,7 @@ void AuthWindow::cancelPreloading(){
 
 void AuthWindow::changingPassEchoMode(){
     linePass->setFocus();
-    if(linePass->echoMode()==QLineEdit::Password){
+    if(linePass->echoMode() == QLineEdit::Password){
         linePass->setEchoMode(QLineEdit::Normal);
         lineConfirmPass->setEchoMode(QLineEdit::Normal);
     }

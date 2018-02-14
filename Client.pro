@@ -50,7 +50,9 @@ SOURCES += \
     UI/Widgets/accountwidget.cpp \
     UI/Widgets/affixcontainer.cpp \
     UI/Widgets/Attachments/attachment.cpp \
-    UI/Widgets/Attachments/image.cpp
+    UI/Widgets/Attachments/image.cpp \
+    Util/ftpclient.cpp \
+    UI/Widgets/accountsettings.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -73,7 +75,9 @@ HEADERS += \
     UI/Widgets/accountwidget.h \
     UI/Widgets/affixcontainer.h \
     UI/Widgets/Attachments/attachment.h \
-    UI/Widgets/Attachments/image.h
+    UI/Widgets/Attachments/image.h \
+    Util/ftpclient.h \
+    UI/Widgets/accountsettings.h
 
 FORMS += \
         UI/mainwindow.ui \

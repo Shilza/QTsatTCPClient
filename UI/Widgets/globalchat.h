@@ -30,6 +30,7 @@ private slots:
     void printMessages(QString, QString, int, QString attachment);
     void selectGlobalItem(QListWidgetItem*);
     void clearAll(bool);
+    void setVerticalScrollBarValue(int, int max);
 };
 
 #endif // GLOBALCHAT_H

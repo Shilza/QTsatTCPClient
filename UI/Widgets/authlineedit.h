@@ -9,7 +9,7 @@ class AuthLineEdit : public QLineEdit{
     Q_OBJECT
 
 public:
-    AuthLineEdit(QWidget *parent=0, bool isDefault = true);
+    AuthLineEdit(QWidget *parent = nullptr, bool isDefault = true);
     void setDisabledOverride();
     void setEnabledOverride();
 private:

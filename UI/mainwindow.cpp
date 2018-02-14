@@ -11,14 +11,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     mainWidget = new QWidget(this);
     mainLayout = new QHBoxLayout(mainWidget);
-
     stackOfWidgets = new QStackedWidget(mainWidget);
-
     menuListWidget = new MenuList(height() - contentsMargins().top() - contentsMargins().bottom() - 2, mainWidget);
-
     globalChat = new GlobalChat(stackOfWidgets);
-
     bansHistory = new BansHistory(stackOfWidgets);
+    accountSettings = new AccountSettings(mainWidget);
 
     labelAttachmentSizeToLarge = new ClickableLabel(mainWidget, false);
     labelAttachmentSizeToLarge->close();
@@ -43,16 +40,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     stackOfWidgets->addWidget(globalChat->getWidget());
     stackOfWidgets->addWidget(bansHistory->getList());
+    stackOfWidgets->addWidget(accountSettings->getMainWidget());
     stackOfWidgets->setCurrentWidget(globalChat->getWidget());
 
     connect(menuListWidget->getButtonBansHistory(), SIGNAL(released()), SLOT(showBansHistory()));
     connect(menuListWidget->getGlobalChatButton(), SIGNAL(released()), SLOT(goToGlobalChat()));
+    connect(menuListWidget->getButtonAccountSettings(), SIGNAL(released()), SLOT(goToAccountSettings()));
     connect(globalChat->getSendWidget(), SIGNAL(attachmentToLarge()), labelAttachmentSizeToLarge, SLOT(show()));
     connect(labelAttachmentSizeToLarge, SIGNAL(released()), labelAttachmentSizeToLarge, SLOT(close()));
+
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(exit(bool)));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), labelAttachmentSizeToLarge, SLOT(close()));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentDeny()), labelAttachmentSizeToLarge, SLOT(show()));
-
+    connect(&(FTPClient::getInstance()), SIGNAL(loadAttachmentDeny()), labelAttachmentSizeToLarge, SLOT(show()));
 }
 
 void MainWindow::start(uint time){
@@ -80,6 +79,10 @@ void MainWindow::goToGlobalChat(){
         request.insert("Value", "GlobalChat");
         TCPClient::getInstance().send(QJsonDocument(request).toJson());
     }
+}
+
+void MainWindow::goToAccountSettings(){
+    stackOfWidgets->setCurrentWidget(accountSettings->getMainWidget());
 }
 
 void MainWindow::exit(bool isExit){

@@ -2,15 +2,12 @@
 #include <QDebug>
 
 TCPClient::TCPClient(QObject *parent) : QObject(parent){
-    serverSocket = new QTcpSocket(this);
-    ftpSocket = new QTcpSocket(this);
+    socket = new QTcpSocket(this);
 
     //host.setAddress(HOST_IP);
-    serverSocket->connectToHost(QHostAddress::LocalHost, SERVER_PORT);
-    ftpSocket->connectToHost(QHostAddress::LocalHost, FTP_PORT);
+    socket->connectToHost(QHostAddress::LocalHost, SERVER_PORT);
 
-    connect(serverSocket, SIGNAL(readyRead()), SLOT(controller()));
-    connect(ftpSocket, SIGNAL(readyRead()), SLOT(ftpController()));
+    connect(socket, SIGNAL(readyRead()), SLOT(controller()));
 }
 
 void TCPClient::tokenRefreshing(){
@@ -19,7 +16,7 @@ void TCPClient::tokenRefreshing(){
     request.insert("Refresh token", refreshToken);
 
     //DO NOT REPLACE THIS WITH "SEND" FUNCTION
-    serverSocket->write(QJsonDocument(request).toJson());
+    socket->write(QJsonDocument(request).toJson());
 }
 
 void TCPClient::configFileUpdate(){
@@ -41,29 +38,16 @@ TCPClient &TCPClient::getInstance(){
 
 void TCPClient::send(QByteArray request){
     lastRequest = request;
-    serverSocket->write(request);
-}
-
-void TCPClient::sendToFTP(QJsonObject request){
-    request.insert("Nickname", nickname);
-    request.insert("Access token", accessToken);
-
-    ftpSocket->write(QJsonDocument(request).toJson());
-}
-
-void TCPClient::postToFTP(QByteArray attachment){
-    qDebug() << "Send attachment";
-    ftpSocket->write(attachment);
-}
-
-void TCPClient::getFromFTP(QString attachment){
-
+    socket->write(request);
 }
 
 void TCPClient::setUser(QString nickname, QString accessToken, QString refreshToken){
     this->nickname = nickname;
     this->accessToken = accessToken;
     this->refreshToken = refreshToken;
+
+    nicknameReceived(nickname);
+    FTPClient::getInstance().setUser(nickname, accessToken, refreshToken);
 }
 
 QString TCPClient::getNickname() const{
@@ -71,7 +55,7 @@ QString TCPClient::getNickname() const{
 }
 
 void TCPClient::controller(){
-    QByteArray receivedObject = serverSocket->readAll();
+    QByteArray receivedObject = socket->readAll();
 
     QJsonParseError error;
 
@@ -114,7 +98,7 @@ void TCPClient::controller(){
                 QJsonObject request;
                 request.insert("Target", "Get");
                 request.insert("Reference", response.value("Attachment").toString());
-                sendToFTP(request);
+                FTPClient::getInstance().send(request);
 
                 emit messageReceived(response.value("Nickname").toString(),
                                      response.value("Message").toString(),
@@ -132,7 +116,7 @@ void TCPClient::controller(){
             QFile configFile("config.txt");
             if(configFile.exists())
                 configFile.remove();
-            setUser(nickname, accessToken, refreshToken);
+            setUser("", "", "");
 
             emit exit(QJsonDocument::fromJson(lastRequest).object().value("Target").toString() == "Exit");
         }
@@ -146,35 +130,5 @@ void TCPClient::controller(){
             configFileUpdate();
             send(lastRequest);
         }
-    }
-}
-
-void TCPClient::ftpController(){
-    qDebug() << "Sos";
-    QByteArray receivedObject = ftpSocket->readAll();
-
-    QJsonParseError error;
-
-    QJsonObject response = QJsonDocument::fromJson(receivedObject, &error).object();
-
-    if(error.error == QJsonParseError::NoError){
-        if(response.value("Target").toString() == "Post"){
-            if(response.value("Value").toString() == "Deny")
-                emit loadAttachmentDeny();
-            else if(response.value("Value").toString() == "Allow")
-                emit loadAttachmentAllow();
-        }
-        else if(response.value("Target").toString() == "Loading"){
-            if(response.value("Value").toInt() == 100)
-                emit postIsFinished(response.value("Reference").toString());
-        }
-        else if(response.value("Target").toString() == "Get"){
-            qDebug() << "Getttt" << response.value("SizeOfAttachment").toInt();
-            emit sizeWasGotten(response.value("SizeOfAttachment").toInt());
-        }
-    }
-    else{
-        qDebug() << "Getting";
-        emit getting(receivedObject);
     }
 }

@@ -10,9 +10,11 @@
 class ImageView : public QWidget
 {
     Q_OBJECT
+
 public:
-   //explicit ImageView(QWidget *parent=0);
     static ImageView& getInstance();
+    ImageView(ImageView const&) = delete;
+    ImageView& operator= (ImageView const&) = delete;
     ~ImageView();
     void create(QWidget *parent);
 
@@ -21,9 +23,7 @@ private:
     QPushButton *buttonClose;
     QGridLayout *mainLayout;
     ClickableLabel *background;
-    ImageView(QWidget* parent = 0);
-    ImageView(ImageView const&) = delete;
-    ImageView& operator= (ImageView const&) = delete;
+    ImageView(QWidget* parent = nullptr);
     bool eventFilter(QObject *target, QEvent *event);
 
 public slots:

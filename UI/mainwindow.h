@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include "UI/Widgets/accountsettings.h"
 #include "UI/Widgets/imageview.h"
 #include "UI/Widgets/banshistory.h"
 #include "UI/Widgets/globalchat.h"
@@ -25,6 +26,7 @@ private:
     MenuList *menuListWidget;
     BansHistory *bansHistory;
     GlobalChat *globalChat;
+    AccountSettings *accountSettings;
     ClickableLabel *labelAttachmentSizeToLarge;
 
 public:
@@ -34,6 +36,7 @@ public:
 private slots:
     void showBansHistory();
     void goToGlobalChat();
+    void goToAccountSettings();
     void exit(bool isExit);
 
 public slots:

@@ -69,6 +69,10 @@ const QWidget *AccountWidget::getWidget() const{
     return mainWidget;
 }
 
+QPushButton *AccountWidget::getButtonSettings() const{
+    return buttonAccountSettings;
+}
+
 bool AccountWidget::eventFilter(QObject *watched, QEvent *event){
     if(watched == mainWidget)
         if(event->type() == QEvent::FocusOut && mainWidget->isVisible()){
@@ -92,7 +96,7 @@ void AccountWidget::exit(){
     TCPClient::getInstance().send(QJsonDocument(request).toJson());
 }
 
-void AccountWidget::exit(bool isExit){
+void AccountWidget::exit(bool){
     mainWidget->close();
     buttonUser->setText("");
 }

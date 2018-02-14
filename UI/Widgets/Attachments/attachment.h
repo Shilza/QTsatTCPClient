@@ -4,7 +4,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <QLayout>
-#include "Util/tcpclient.h"
+#include "Util/ftpclient.h"
 
 class Attachment : public QWidget
 {
@@ -23,7 +23,6 @@ protected slots:
     virtual void fill(QByteArray data) = 0;
     virtual void open() = 0;
     void setAttachmentSize(int sizeOfAttachment);
-
 };
 
 #endif // ATTACHMENT_H

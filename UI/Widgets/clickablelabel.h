@@ -6,11 +6,14 @@
 class ClickableLabel : public QLabel
 {
     Q_OBJECT
+
 public:
-    explicit ClickableLabel(QWidget* parent=0, bool isUnderlined=true);
+    explicit ClickableLabel(QWidget* parent = nullptr, bool isUnderlined=true);
     ~ClickableLabel();
+
 signals:
     void released();
+
 private:
     bool isUnderlined;
     void mouseReleaseEvent(QMouseEvent* event);

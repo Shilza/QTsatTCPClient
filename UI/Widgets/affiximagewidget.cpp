@@ -59,12 +59,13 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
                                   "border: 0px;"
                                   "color: white;");
 
-    connect(originalSize, SIGNAL(released()), SLOT(originalSize_released()));
+    connect(originalSize, SIGNAL(released()), SLOT(showOrigin()));
+    connect(buttonOk, SIGNAL(released()), SLOT(showOrigin()));
     connect(buttonCloseAffixedPicture, SIGNAL(released()), SLOT(buttonCloseAffixedPicture_released()));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(buttonCloseAffixedPicture_released()));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentDeny()), SLOT(affixError()));
-    connect(&(TCPClient::getInstance()), SIGNAL(loadAttachmentAllow()), SLOT(affixAllow()));
-    connect(&(TCPClient::getInstance()), SIGNAL(postIsFinished(QString)), SLOT(showButtonOk()));
+    connect(&(FTPClient::getInstance()), SIGNAL(loadAttachmentDeny()), SLOT(affixError()));
+    connect(&(FTPClient::getInstance()), SIGNAL(loadAttachmentAllow()), SLOT(affixAllow()));
+    connect(&(FTPClient::getInstance()), SIGNAL(postIsFinished(QString)), SLOT(showButtonOk()));
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(clearing()));
 }
 
@@ -93,7 +94,7 @@ void AffixImageWidget::receivedImageTreatment(QPixmap image, QString extension){
         image = image.scaled(sendedImageSize-2,sendedImageSize-2);
 
     sendedImage->setIcon(QIcon(image));
-    sendedImage->setIconSize(QSize(sendedImageSize-2,sendedImageSize-2));
+    sendedImage->setIconSize(QSize(sendedImageSize-2, sendedImageSize-2));
     mainAffixLayout->addWidget(sendedImage, 1, Qt::AlignLeft | Qt::AlignBottom);
     sendedImage->show();
 }
@@ -118,7 +119,7 @@ void AffixImageWidget::affixAllow(){
     QBuffer buffer(&attachment);
     buffer.open(QIODevice::WriteOnly);
     affixImage.save(&buffer, extension.toStdString().c_str());
-    TCPClient::getInstance().postToFTP(attachment);
+    FTPClient::getInstance().post(attachment);
 }
 
 void AffixImageWidget::showButtonOk(){
@@ -170,6 +171,6 @@ bool AffixImageWidget::eventFilter(QObject *target, QEvent *event)
     return QObject::eventFilter(target, event);
 }
 
-void AffixImageWidget::originalSize_released(){
+void AffixImageWidget::showOrigin(){
     emit originalSizeReleased(affixImage);
 }

@@ -93,6 +93,10 @@ const QPushButton *MenuList::getGlobalChatButton() const{
     return buttonGlobalChat;
 }
 
+const QPushButton *MenuList::getButtonAccountSettings() const{
+    return accountWidget->getButtonSettings();
+}
+
 void MenuList::overlapping(){
     widgetOverlappingUserPage->show();
 }

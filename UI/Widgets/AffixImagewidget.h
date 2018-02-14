@@ -14,10 +14,12 @@
 class AffixImageWidget : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit AffixImageWidget(QWidget *parent = nullptr);
     QWidget *getSendedImage();
     ~AffixImageWidget();
+
 private:
     QWidget *mainWidget;
     QHBoxLayout *mainAffixLayout;
@@ -45,7 +47,7 @@ public slots:
     void receivedImageTreatment(QPixmap image, QString extension);
 
 private slots:
-    void originalSize_released();
+    void showOrigin();
     void buttonCloseAffixedPicture_released();
     void affixError();
     void affixAllow();

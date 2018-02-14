@@ -8,14 +8,14 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 #include <QJsonArray>
+#include "Util/ftpclient.h"
 #include "Config/def.h"
 
 class TCPClient : public QObject
 {
     Q_OBJECT
 private:
-    QTcpSocket *serverSocket;
-    QTcpSocket *ftpSocket;
+    QTcpSocket *socket;
     QHostAddress host;
 
     TCPClient(QObject *parent = 0);
@@ -31,9 +31,6 @@ private:
 public:
     static TCPClient& getInstance();
     void send(QByteArray request);
-    void sendToFTP(QJsonObject request);
-    void postToFTP(QByteArray attachment);
-    void getFromFTP(QString attachment);
     void setUser(QString nickname, QString accessToken, QString refreshToken);
     QString getNickname() const;
 
@@ -56,15 +53,10 @@ signals:
     void banStarted(uint);
     void exit(bool);
     void bansHistory(QJsonArray, bool);
-    void loadAttachmentDeny();
-    void loadAttachmentAllow();
-    void postIsFinished(QString reference);
-    void getting(QByteArray);
-    void sizeWasGotten(int);
+    void nicknameReceived(QString);
 
 private slots:
     void controller();
-    void ftpController();
 };
 
 #endif // TCPCLIENT_H

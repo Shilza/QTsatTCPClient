@@ -41,6 +41,7 @@ GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString, QString, int, QString)), SLOT(printMessages(QString, QString, int, QString)));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(clearAll(bool)));
     connect(affixImageWidget, SIGNAL(originalSizeReleased(QPixmap)), &(ImageView::getInstance()), SLOT(setPicture(QPixmap)));
+    connect(listOfGlobalMessages->verticalScrollBar(), SIGNAL(rangeChanged(int,int)), SLOT(setVerticalScrollBarValue(int, int)));
 }
 
 QWidget *GlobalChat::getWidget(){
@@ -114,7 +115,7 @@ void GlobalChat::printMessages(QString strNickname, QString message, int time, Q
 
     if(attchExtension != ""){
         Image *attachment = new Image(attchExtension, widget);
-        layout->addWidget(attachment->getMainFrame(), 3, 1, 1, 4, Qt::AlignLeft | Qt::AlignTop);
+        layout->addWidget(attachment->getMainFrame(), message == "" ? 1 : 3, 1, 1, 4, Qt::AlignLeft | Qt::AlignTop);
     }
 
     item->setSizeHint(QSize(widget->width(), layout->sizeHint().height()));
@@ -128,4 +129,8 @@ void GlobalChat::selectGlobalItem(QListWidgetItem *item){
 void GlobalChat::clearAll(bool){
     listOfGlobalMessages->clear();
     sendWidget->getTextMessage()->clear();
+}
+
+void GlobalChat::setVerticalScrollBarValue(int, int max){
+    listOfGlobalMessages->verticalScrollBar()->setValue(max);
 }

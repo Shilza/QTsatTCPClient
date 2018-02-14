@@ -144,7 +144,7 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(messageSended()));
     connect(&(TCPClient::getInstance()), SIGNAL(banFinished(bool)), SLOT(banFinishing(bool)));
     connect(&(TCPClient::getInstance()), SIGNAL(banStarted(uint)), SLOT(ban(uint)));
-    connect(&(TCPClient::getInstance()), SIGNAL(postIsFinished(QString)), SLOT(setReference(QString)));
+    connect(&(FTPClient::getInstance()), SIGNAL(postIsFinished(QString)), SLOT(setReference(QString)));
 }
 
 void SendWidget::floodErrorHide(){
@@ -173,13 +173,13 @@ void SendWidget::updateTime(){
 }
 
 void SendWidget::showSymbolsCount(){
-    labelSymbolsCount->setText(QString::number(textMessage->toPlainText().length())+"/"+QString::number(MAX_GLOBAL_MESSAGE_SIZE));
+    labelSymbolsCount->setText(QString::number(textMessage->toPlainText().length()) + "/" + QString::number(MAX_GLOBAL_MESSAGE_SIZE));
     labelSymbolsCount->show();
 }
 
 void SendWidget::send(){
     QString message = textMessage->toPlainText();
-    if(message.simplified() == " " || message.simplified() == "" || message == "")
+    if((message.simplified() == " " || message.simplified() == "" || message == "") && countOfAttachment == 0)
         return;
 
     QJsonObject request;
@@ -198,19 +198,19 @@ void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
     if(countOfAttachment<1){
         int size=0;
         QString typeName = QString(affix.typeName());
+
         if(typeName == "QPixmap" || typeName == "QImage"){
 
             QPixmap image = qvariant_cast<QPixmap>(affix);
-
             if(image.isNull())
                 return;
 
             size = getSize(image, extension);
 
-            /*if(size > MAX_AFFIX_SIZE){
+            if(size > MAX_AFFIX_SIZE){
                 emit attachmentToLarge();
                 return;
-            }*/
+            }
 
             emit imageReceived(image, extension);
         }
@@ -220,7 +220,7 @@ void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
         request.insert("Extension", extension);
         request.insert("Location", "GlobalChat");
         request.insert("Size", size);
-        TCPClient::getInstance().sendToFTP(request);
+        FTPClient::getInstance().send(request);
 
         countOfAttachment++;
     }

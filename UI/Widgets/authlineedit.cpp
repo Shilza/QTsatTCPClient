@@ -5,6 +5,7 @@ AuthLineEdit::AuthLineEdit(QWidget *parent, bool isDefault) : QLineEdit(parent){
     setAcceptDrops(false);
     setContextMenuPolicy(Qt::CustomContextMenu);
     setDefaultStyleSheet();
+
     connect(this, SIGNAL(customContextMenuRequested(QPoint)), SLOT(showMenu(QPoint)));
     if(isDefault)
         connect(this, SIGNAL(textChanged(QString)), SLOT(setDefaultStyleSheet()));
