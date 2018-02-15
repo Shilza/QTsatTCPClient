@@ -80,11 +80,11 @@ AuthWindow::AuthWindow(QMainWindow *parent) :
 
     lineEmail->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,32}")));
     lineLog->setValidator(new QRegExpValidator(QRegExp("([^@]){,32}(@?)([^@]){,12}")));
-    lineConfirmPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[._]){6,32}$")));
-    linePass->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[._]){6,32}$")));
-    lineRecoveryPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[._]){6,32}$")));
-    lineRecoveryConfirmPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[._]){6,32}$")));
-    lineConfirmCode->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w){,6}$")));
+    lineConfirmPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|[A-z]|[._]){6,32}$")));
+    linePass->setValidator(new QRegExpValidator(QRegExp("^(\\d|[A-z]|[._]){6,32}$")));
+    lineRecoveryPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|[A-z]|[._]){6,32}$")));
+    lineRecoveryConfirmPass->setValidator(new QRegExpValidator(QRegExp("^(\\d|[A-z]|[._]){6,32}$")));
+    lineConfirmCode->setValidator(new QRegExpValidator(QRegExp("^(\\d|[A-z]){,6}$")));
 
     linePass->setEchoMode(QLineEdit::Password);
     lineConfirmPass->setEchoMode(QLineEdit::Password);
@@ -1323,7 +1323,7 @@ void AuthWindow::gotoSignUpLoc(){
     isPassEmpty=false;
 
     lineLog->setPlaceholderText("Nickname");
-    lineLog->setValidator(new QRegExpValidator(QRegExp("^(\\d|\\w|[_.]){3,12}$")));
+    lineLog->setValidator(new QRegExpValidator(QRegExp("^(\\d|[A-z]|[_.]){3,12}$")));
 
     lineConfirmPass->show();
     lineEmail->show();
@@ -2068,7 +2068,6 @@ void AuthWindow::setPassEnabled(){
                              "background: transparent; border: 1px solid gray; border-left: 0px;"
                              "}");
 }
-
 
 AuthWindow::~AuthWindow(){
     delete ui;

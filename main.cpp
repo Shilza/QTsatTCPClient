@@ -16,7 +16,9 @@ int main(int argc, char *argv[])
             configFile.remove();
         else{
             QJsonObject configJson = QJsonDocument::fromJson(configFile.readAll()).object();
-            authWindow->start(configJson.value("Nickname").toString(), configJson.value("Access token").toString(), configJson.value("Refresh token").toString());
+            authWindow->start(configJson.value("Nickname").toString(),
+                              configJson.value("Access token").toString(),
+                              configJson.value("Refresh token").toString());
         }
         configFile.close();
     }

@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent) :
     menuListWidget = new MenuList(height() - contentsMargins().top() - contentsMargins().bottom() - 2, mainWidget);
     globalChat = new GlobalChat(stackOfWidgets);
     bansHistory = new BansHistory(stackOfWidgets);
-    accountSettings = new AccountSettings(mainWidget);
+    accountSettings = new AccountSettings(stackOfWidgets);
 
     labelAttachmentSizeToLarge = new ClickableLabel(mainWidget, false);
     labelAttachmentSizeToLarge->close();
@@ -47,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(menuListWidget->getGlobalChatButton(), SIGNAL(released()), SLOT(goToGlobalChat()));
     connect(menuListWidget->getButtonAccountSettings(), SIGNAL(released()), SLOT(goToAccountSettings()));
     connect(globalChat->getSendWidget(), SIGNAL(attachmentToLarge()), labelAttachmentSizeToLarge, SLOT(show()));
+    connect(accountSettings, SIGNAL(attachmentToLarge()), labelAttachmentSizeToLarge, SLOT(show()));
     connect(labelAttachmentSizeToLarge, SIGNAL(released()), labelAttachmentSizeToLarge, SLOT(close()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(exit(bool)));
