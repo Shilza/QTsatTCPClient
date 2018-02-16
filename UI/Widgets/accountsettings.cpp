@@ -32,7 +32,8 @@ AccountSettings::AccountSettings(QWidget *parent) : QWidget(parent){
     mainWidget = new QWidget(this);
     mainLayout = new QGridLayout(mainWidget);
 
-    buttonAvatar = new QPushButton(mainWidget);
+    avatarWidget = new QWidget(mainWidget);
+    buttonAvatar = new QPushButton(avatarWidget);
     buttonAvatarChanging = new QPushButton("Change avatar", mainWidget);
 
     labelNickname = new QLabel("Nickname", mainWidget);
@@ -62,12 +63,16 @@ AccountSettings::AccountSettings(QWidget *parent) : QWidget(parent){
     mainLayout->setContentsMargins(30, 10, 30, 10);
 
 
-    buttonAvatar->setFixedSize(50, 50);
-    buttonAvatar->setIconSize(buttonAvatar->size());
-    buttonAvatar->setMask(QRegion(0, 0, buttonAvatar->width(), buttonAvatar->height(), QRegion::Ellipse));
-    buttonAvatar->setStyleSheet("background: black;"
-                                "border: 1px solid red;"
+    avatarWidget->setFixedSize(50, 50);
+    avatarWidget->setStyleSheet("background: red;"
+                                "border: 0px;"
                                 "border-radius: 25px;");
+    buttonAvatar->setFixedSize(52, 52);
+    buttonAvatar->move(-1, -1);
+    buttonAvatar->setIconSize(buttonAvatar->size());
+    buttonAvatar->setMask(QRegion(-1, -1, buttonAvatar->width()+2, buttonAvatar->height()+2, QRegion::Ellipse));
+    buttonAvatar->setStyleSheet("background: black;"
+                                "border-radius: 26px;");
     buttonAvatar->setCursor(Qt::PointingHandCursor);
 
     buttonAvatarChanging->setFixedSize(100, 30);
@@ -133,7 +138,7 @@ AccountSettings::AccountSettings(QWidget *parent) : QWidget(parent){
     buttonActivityHistory->setStyleSheet(defaultButtonsStyle);
     buttonActivityHistory->setFixedSize(80, 25);
 
-    mainLayout->addWidget(buttonAvatar, 0, 0, 1, -1, Qt::AlignTop | Qt::AlignHCenter);
+    mainLayout->addWidget(avatarWidget, 0, 0, 1, -1, Qt::AlignTop | Qt::AlignHCenter);
     mainLayout->addWidget(buttonAvatarChanging, 1, 0, 1, -1, Qt::AlignTop | Qt::AlignHCenter);
 
     mainLayout->addWidget(labelNickname, 2, 0, 1, 1, Qt::AlignTop | Qt::AlignLeft);
@@ -161,6 +166,8 @@ AccountSettings::AccountSettings(QWidget *parent) : QWidget(parent){
     connect(buttonAvatarChanging, SIGNAL(released()), SLOT(avatarChanging()));
     connect(buttonEye, SIGNAL(released()), SLOT(setPassEchoMode()));
     connect(&(TCPClient::getInstance()), SIGNAL(nicknameReceived(QString)), SLOT(setNickname(QString)));
+    connect(&(FTPClient::getInstance()), SIGNAL(loadAvatarAllow()), SLOT(loadingAvatarToFTP()));
+    connect(&(FTPClient::getInstance()), SIGNAL(avatarChanged()), SLOT(setAvatarImage()));
 }
 
 QWidget *AccountSettings::getMainWidget() const{
@@ -173,10 +180,11 @@ void AccountSettings::avatarChanging(){
 
     QString temp = QFileDialog::getOpenFileName(this, QObject::tr("Choose an image"), lastPath, QObject::tr("Image file (*.png *.jpg *.jpeg *.jpe *.bmp);;Все файлы (*.*)"));
     if(temp != ""){
-        QString extension = temp.split('.').back();
+        avatarExtension = temp.split('.').back();
+
         lastPath = temp;
         avatarImage = QPixmap(temp);
-        size = getSize(avatarImage, extension);
+        size = getSize(avatarImage, avatarExtension);
 
         if(size > MAX_AFFIX_SIZE){
             emit attachmentToLarge();
@@ -184,16 +192,13 @@ void AccountSettings::avatarChanging(){
             return;
         }
 
-        buttonAvatar->setIcon(QIcon(avatarImage));
-
-        /*
         QJsonObject request;
         request.insert("Target", "Post");
-        request.insert("Extension", extension);
+        request.insert("Extension", avatarExtension);
         request.insert("Location", "Avatar");
         request.insert("Size", size);
         FTPClient::getInstance().send(request);
-        */
+
         //emit imageReceived(image, extension);
     }
 }
@@ -204,6 +209,15 @@ void AccountSettings::setAvatarImage(QPixmap image){
 
 void AccountSettings::setAvatarImage(){
     buttonAvatar->setIcon(QIcon(avatarImage));
+}
+
+void AccountSettings::loadingAvatarToFTP(){
+    qDebug() << "ALOOWWW";
+    QByteArray attachment;
+    QBuffer buffer(&attachment);
+    buffer.open(QIODevice::WriteOnly);
+    avatarImage.save(&buffer, avatarExtension.toStdString().c_str());
+    FTPClient::getInstance().post(attachment);
 }
 
 void AccountSettings::setNickname(QString nickname){

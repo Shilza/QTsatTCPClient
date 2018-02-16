@@ -52,7 +52,8 @@ SOURCES += \
     UI/Widgets/Attachments/attachment.cpp \
     UI/Widgets/Attachments/image.cpp \
     Util/ftpclient.cpp \
-    UI/Widgets/accountsettings.cpp
+    UI/Widgets/accountsettings.cpp \
+    UI/Widgets/affixaudiowidget.cpp
 
 HEADERS += \
         UI/mainwindow.h \
@@ -77,7 +78,8 @@ HEADERS += \
     UI/Widgets/Attachments/attachment.h \
     UI/Widgets/Attachments/image.h \
     Util/ftpclient.h \
-    UI/Widgets/accountsettings.h
+    UI/Widgets/accountsettings.h \
+    UI/Widgets/affixaudiowidget.h
 
 FORMS += \
         UI/mainwindow.ui \

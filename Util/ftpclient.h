@@ -34,9 +34,11 @@ private:
 signals:
     void loadAttachmentDeny();
     void loadAttachmentAllow();
+    void loadAvatarAllow();
     void postIsFinished(QString reference);
     void getting(QByteArray);
     void sizeWasGotten(int);
+    void avatarChanged();
 
 private slots:
     void controller();

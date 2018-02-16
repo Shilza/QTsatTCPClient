@@ -28,9 +28,11 @@ private:
     QWidget *mainWidget;
     QGridLayout *mainLayout;
 
+    QWidget *avatarWidget;
     QPixmap avatarImage;
     QPushButton *buttonAvatar;
     QPushButton *buttonAvatarChanging;
+    QString avatarExtension;
 
     QLabel *labelNickname;
     QLineEdit *lineNewNickname;
@@ -55,6 +57,7 @@ private slots:
     void setPassEchoMode();
     void setAvatarImage(QPixmap image);
     void setAvatarImage();
+    void loadingAvatarToFTP();
 
 signals:
     void attachmentToLarge();
