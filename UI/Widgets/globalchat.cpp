@@ -3,11 +3,13 @@
 
 GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     close();
+
     globalChatWidget = new QWidget(parent);
     globalChatLayout = new QGridLayout(globalChatWidget);
     listOfGlobalMessages = new QListWidget(globalChatWidget);
 
     affixImageWidget = new AffixImageWidget(globalChatWidget);
+    affixAudioWidget = new AffixAudioWidget(globalChatWidget);
 
     sendWidget = new SendWidget(globalChatWidget);
 
@@ -32,11 +34,14 @@ GlobalChat::GlobalChat(QWidget *parent) : QWidget(parent){
     globalChatLayout->setMargin(3);
 
     globalChatLayout->addWidget(listOfGlobalMessages, 0, 0, 8, 9);
-    globalChatLayout->addWidget(affixImageWidget->getSendedImage(), 6,0,2,9, Qt::AlignLeft | Qt::AlignBottom);
+    globalChatLayout->addWidget(affixImageWidget->getMainWidget(), 6,0,2,9, Qt::AlignLeft | Qt::AlignBottom);
+    globalChatLayout->addWidget(affixAudioWidget->getMainWidget(), 6,0,2,9, Qt::AlignLeft | Qt::AlignBottom);
     globalChatLayout->addWidget(sendWidget->getMainWidget(), 8, 0, 2, 9);
 
     connect(sendWidget, SIGNAL(imageReceived(QPixmap, QString)), affixImageWidget, SLOT(receivedImageTreatment(QPixmap, QString)));
-    connect(affixImageWidget, SIGNAL(detachmentImage()), sendWidget, SLOT(decrementing()));
+    connect(sendWidget, SIGNAL(songReceived(QByteArray, QString)), affixAudioWidget, SLOT(receivedSongTreatment(QByteArray, QString)));
+    connect(affixImageWidget, SIGNAL(detachment()), sendWidget, SLOT(decrementing()));
+    connect(affixAudioWidget, SIGNAL(detachment()), sendWidget, SLOT(decrementing()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(messageReceived(QString, QString, int, QString)), SLOT(printMessages(QString, QString, int, QString)));
     connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(clearAll(bool)));

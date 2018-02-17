@@ -1,4 +1,5 @@
 #include "AffixImagewidget.h"
+#include <QDebug>
 
 AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
     close();
@@ -61,15 +62,15 @@ AffixImageWidget::AffixImageWidget(QWidget *parent) : QWidget(parent){
 
     connect(originalSize, SIGNAL(released()), SLOT(showOrigin()));
     connect(buttonOk, SIGNAL(released()), SLOT(showOrigin()));
-    connect(buttonCloseAffixedPicture, SIGNAL(released()), SLOT(buttonCloseAffixedPicture_released()));
-    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(buttonCloseAffixedPicture_released()));
+    connect(buttonCloseAffixedPicture, SIGNAL(released()), SLOT(closing()));
+    connect(&(TCPClient::getInstance()), SIGNAL(exit(bool)), SLOT(closing()));
     connect(&(FTPClient::getInstance()), SIGNAL(loadAttachmentDeny()), SLOT(affixError()));
-    connect(&(FTPClient::getInstance()), SIGNAL(loadAttachmentAllow()), SLOT(affixAllow()));
+    connect(&(FTPClient::getInstance()), SIGNAL(loadAttachmentAllow()), SLOT(loading()));
     connect(&(FTPClient::getInstance()), SIGNAL(postIsFinished(QString)), SLOT(showButtonOk()));
     connect(&(TCPClient::getInstance()), SIGNAL(messageSended()), SLOT(clearing()));
 }
 
-QWidget *AffixImageWidget::getSendedImage(){
+QWidget *AffixImageWidget::getMainWidget(){
     return mainWidget;
 }
 
@@ -99,12 +100,9 @@ void AffixImageWidget::receivedImageTreatment(QPixmap image, QString extension){
     sendedImage->show();
 }
 
-void AffixImageWidget::buttonCloseAffixedPicture_released(){
-    affixImage = QPixmap(); //cleaning
-    labelLoadError->close();
-    isLoadError = false;
-    sendedImage->close();
-    emit detachmentImage();
+void AffixImageWidget::closing(){
+    clearing();
+    emit detachment();
 }
 
 void AffixImageWidget::affixError(){
@@ -112,14 +110,16 @@ void AffixImageWidget::affixError(){
     labelLoadError->show();
 }
 
-void AffixImageWidget::affixAllow(){
-    isLoadError = false;
-    labelLoadError->close();
-    QByteArray attachment;
-    QBuffer buffer(&attachment);
-    buffer.open(QIODevice::WriteOnly);
-    affixImage.save(&buffer, extension.toStdString().c_str());
-    FTPClient::getInstance().post(attachment);
+void AffixImageWidget::loading(){
+    if(!affixImage.isNull()){
+        isLoadError = false;
+        labelLoadError->close();
+        QByteArray attachment;
+        QBuffer buffer(&attachment);
+        buffer.open(QIODevice::WriteOnly);
+        affixImage.save(&buffer, extension.toStdString().c_str());
+        FTPClient::getInstance().post(attachment);
+    }
 }
 
 void AffixImageWidget::showButtonOk(){

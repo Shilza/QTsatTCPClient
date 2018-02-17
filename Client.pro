@@ -7,7 +7,8 @@
 QT       += core gui
 QT       += core
 QT       += network
-QT += svg
+QT       += svg
+QT       += core gui multimedia
 
 CONFIG   += c++11 console
 

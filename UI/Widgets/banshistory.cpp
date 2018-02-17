@@ -2,6 +2,7 @@
 
 BansHistory::BansHistory(QWidget *parent) : QWidget(parent){
     close();
+
     listBansHistory = new QListWidget(parent);
     preloader = new QSvgWidget(listBansHistory);
 

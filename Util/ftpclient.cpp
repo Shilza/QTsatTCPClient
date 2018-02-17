@@ -45,7 +45,6 @@ void FTPClient::controller(){
             if(response.value("Value").toString() == "Deny")
                 emit loadAttachmentDeny();
             else if(response.value("Value").toString() == "Allow"){
-                qDebug() << response;
                 if(response.value("Location").toString() == "GlobalChat")
                     emit loadAttachmentAllow();
                 else if(response.value("Location").toString().indexOf("/Avatars") != -1)
@@ -60,12 +59,9 @@ void FTPClient::controller(){
             emit avatarChanged();
         }
         else if(response.value("Target").toString() == "Get"){
-            qDebug() << "Getttt" << response.value("SizeOfAttachment").toInt();
             emit sizeWasGotten(response.value("SizeOfAttachment").toInt());
         }
     }
-    else{
-        qDebug() << "Getting";
+    else
         emit getting(receivedObject);
-    }
 }

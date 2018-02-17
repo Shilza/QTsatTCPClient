@@ -137,7 +137,7 @@ SendWidget::SendWidget(QWidget *parent): QWidget(parent){
     connect(floodTimer, SIGNAL(errorTimeout()), SLOT(floodErrorHide()));
     connect(floodTimer, SIGNAL(showTimeout()), SLOT(updateTime()));
     connect(textMessage, SIGNAL(imageReceived(QVariant, QString)), SLOT(affixReceivedRedirect(QVariant, QString)));
-    connect(affixContainer, SIGNAL(pictureIsComing(QVariant,QString)), SLOT(affixReceivedRedirect(QVariant,QString)));
+    connect(affixContainer, SIGNAL(attachmentIsComing(QVariant, QString)), SLOT(affixReceivedRedirect(QVariant, QString)));
     connect(banTimer, SIGNAL(timeout()), SLOT(banFinished()));
 
     connect(&(TCPClient::getInstance()), SIGNAL(flood(int)), SLOT(floodReceived(int)));
@@ -213,6 +213,12 @@ void SendWidget::affixReceivedRedirect(QVariant affix, QString extension){
             }
 
             emit imageReceived(image, extension);
+        }
+        else if(extension.split('.').back() == "mp3"){
+            if(affix.toByteArray().size() < MAX_AFFIX_SIZE)
+                emit songReceived(affix.toByteArray(), extension);
+            else
+                emit attachmentToLarge();
         }
 
         QJsonObject request;

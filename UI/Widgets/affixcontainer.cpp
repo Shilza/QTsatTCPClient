@@ -68,6 +68,7 @@ AffixContainer::AffixContainer(QWidget *parent) : QWidget(parent){
     buttonAffix->installEventFilter(this);
 
     connect(buttonPhotos, SIGNAL(released()), SLOT(selectImage()));
+    connect(buttonAudios, SIGNAL(released()), SLOT(selectSong()));
 }
 
 QPushButton *AffixContainer::getButtonAffix(){
@@ -125,9 +126,22 @@ bool AffixContainer::eventFilter(QObject *target, QEvent *event){
 
 void AffixContainer::selectImage(){
     static QString lastPath = QDir::homePath();
-    QString temp = QFileDialog::getOpenFileName(this, QObject::tr("Choose an image"), lastPath, QObject::tr("Image file (*.png *.jpg *.jpeg *.jpe *.bmp);;Все файлы (*.*)"));
-    if(temp != ""){
-        pictureIsComing(QVariant(QPixmap(temp)), temp.split('.').back());
-        lastPath = temp;
+    QString filePath = QFileDialog::getOpenFileName(this, QObject::tr("Choose an image"), lastPath, QObject::tr("Image file (*.png *.jpg *.jpeg *.jpe *.bmp);;Все файлы (*.*)"));
+    if(filePath != ""){
+        attachmentIsComing(QVariant(QPixmap(filePath)), filePath.split('.').back());
+        lastPath = filePath;
+    }
+}
+
+void AffixContainer::selectSong(){
+    static QString lastPath = QDir::homePath();
+    QString filePath = QFileDialog::getOpenFileName(this, QObject::tr("Choose an song"), lastPath, QObject::tr("Image file (*.mp3);;Все файлы (*.*)"));
+    if(filePath != ""){
+        QFile file(filePath);
+        file.open(QIODevice::ReadOnly);
+
+        attachmentIsComing(QVariant(file.readAll()), filePath);
+        file.close();
+        lastPath = filePath;
     }
 }

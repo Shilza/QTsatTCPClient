@@ -11,10 +11,12 @@
 class AffixContainer : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit AffixContainer(QWidget *parent);
     QPushButton *getButtonAffix();
     QPushButton *getAffixWidgetContaiter() const;
+
 private:
     QPushButton *affixWidgetContainer;
     QHBoxLayout *affixLayout;
@@ -25,10 +27,13 @@ private:
     QPushButton *buttonAffix;
 
     bool eventFilter(QObject *target, QEvent *event);
+
 private slots:
     void selectImage();
+    void selectSong();
+
 signals:
-    void pictureIsComing(QVariant affix, QString extension);
+    void attachmentIsComing(QVariant affix, QString extension);
 };
 
 #endif // AFFIXCONTAINER_H

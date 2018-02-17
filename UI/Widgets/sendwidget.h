@@ -7,7 +7,6 @@
 #include <QScrollBar>
 #include <QDateTime>
 #include <QLocale>
-#include <QBuffer>
 #include "Util/tcpclient.h"
 #include "Util/floodtimer.h"
 #include "Util/sizecounting.h"
@@ -19,6 +18,7 @@
 class SendWidget : public QWidget
 {
     Q_OBJECT
+
 public:
     explicit SendWidget(QWidget *parent=0);
     QWidget *getMainWidget();
@@ -50,6 +50,7 @@ private:
 signals:
     void imageReceived(QPixmap image, QString extension);
     void attachmentToLarge();
+    void songReceived(QByteArray song, QString filePath);
 
 private slots:
     void floodErrorHide();

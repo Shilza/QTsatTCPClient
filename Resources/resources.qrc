@@ -24,5 +24,7 @@
         <file>originalSize.png</file>
         <file>list.png</file>
         <file>ok.png</file>
+        <file>pause.png</file>
+        <file>play.png</file>
     </qresource>
 </RCC>

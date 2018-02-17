@@ -17,7 +17,7 @@ class AffixImageWidget : public QWidget
 
 public:
     explicit AffixImageWidget(QWidget *parent = nullptr);
-    QWidget *getSendedImage();
+    QWidget *getMainWidget();
     ~AffixImageWidget();
 
 private:
@@ -41,16 +41,16 @@ private:
 
 signals:
     void originalSizeReleased(QPixmap);
-    void detachmentImage();
+    void detachment();
 
 public slots:
     void receivedImageTreatment(QPixmap image, QString extension);
 
 private slots:
     void showOrigin();
-    void buttonCloseAffixedPicture_released();
+    void closing();
     void affixError();
-    void affixAllow();
+    void loading();
     void showButtonOk();
     void hideButtonOk();
     void clearing();
