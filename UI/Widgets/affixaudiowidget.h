@@ -17,13 +17,13 @@ class AffixAudioWidget : public QWidget
 
 public:
     explicit AffixAudioWidget(QWidget *parent = nullptr);
-    QWidget *getMainWidget() const;
+    QPushButton *getMainWidget() const;
 
 public slots:
     void receivedSongTreatment(QByteArray song, QString filePath);
 
 private:
-    QWidget *mainWidget;
+    QPushButton *mainWidget;
     QGridLayout *mainLayout;
     QMediaPlayer player;
     QLabel *labelTrack;
@@ -36,6 +36,7 @@ private:
 
     QString filePath;
     QByteArray song;
+
     bool isSliderTrackPressed = false;
 
 private slots:
@@ -43,7 +44,7 @@ private slots:
     void closing();
     void loading();
     void setSliderTrackPosition(qint64 position);
-    void setSongValue(int value);
+    void setSongValue();
 
 signals:
     void detachment();

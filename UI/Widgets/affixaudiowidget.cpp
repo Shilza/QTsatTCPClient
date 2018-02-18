@@ -4,7 +4,7 @@
 AffixAudioWidget::AffixAudioWidget(QWidget *parent) : QWidget(parent){
     close();
 
-    mainWidget = new QWidget(parent);
+    mainWidget = new QPushButton(parent);
     mainLayout = new QGridLayout(mainWidget);
 
     labelTrack = new QLabel("Sas - sgdofkgdkjfgolkdg", mainWidget);
@@ -16,15 +16,22 @@ AffixAudioWidget::AffixAudioWidget(QWidget *parent) : QWidget(parent){
     buttonClose = new QPushButton(mainWidget);
 
     mainWidget->setLayout(mainLayout);
-    mainWidget->setStyleSheet("background: #EFFAF8;"
-                              "border: 1px solid black;"
-                              "border-radius: 2px;");
+    mainWidget->setCursor(Qt::PointingHandCursor);
+    mainWidget->setStyleSheet("QPushButton{"
+                              "background: #F7FCFC;"
+                              "border: 1px solid gray;"
+                              "border-radius: 4px;"
+                              "}"
+                              "QPushButton:hover{"
+                              "background: #EFFAF8;"
+                              "}");
     mainWidget->setFixedSize(272, 54);
 
     buttonClose->setStyleSheet("background: transparent;"
                                "border: 0px;");
-    buttonClose->move(mainWidget->width()-15, 0);
     buttonClose->setFixedSize(15, 15);
+    buttonClose->move(mainWidget->width()-buttonClose->width(), 0);
+    buttonClose->setCursor(Qt::PointingHandCursor);
     buttonClose->setIcon(QIcon(":/images/close1.png"));
     buttonClose->setIconSize(buttonClose->size());
     buttonClose->setToolTip("Detach");
@@ -33,6 +40,7 @@ AffixAudioWidget::AffixAudioWidget(QWidget *parent) : QWidget(parent){
     buttonControll->setStyleSheet("background: #393838;"
                                   "border: 0px;"
                                   "border-radius: 20px;");
+    buttonControll->setCursor(Qt::PointingHandCursor);
     buttonControll->setIcon(QIcon(":images/play.png"));
     buttonControll->setIconSize(buttonControll->size());
 
@@ -73,6 +81,7 @@ AffixAudioWidget::AffixAudioWidget(QWidget *parent) : QWidget(parent){
                                "border: 1px solid black;"
                                "}");
     sliderTrack->setFixedHeight(10);
+    sliderTrack->setCursor(Qt::PointingHandCursor);
 
     sliderVolume->setStyleSheet("QSlider{"
                                 "border: 0px;"
@@ -103,7 +112,8 @@ AffixAudioWidget::AffixAudioWidget(QWidget *parent) : QWidget(parent){
                                 "}");
     sliderVolume->setFixedSize(12, 46);
     sliderVolume->setValue(50);
-    player.setVolume(50);
+    sliderVolume->setCursor(Qt::PointingHandCursor);
+    player.setVolume(sliderVolume->value());
 
     mainLayout->addWidget(buttonControll, 0, 0, 3, 1, Qt::AlignLeft);
     mainLayout->addWidget(labelTrack, 0, 1, 1, 4, Qt::AlignTop);
@@ -122,12 +132,13 @@ AffixAudioWidget::AffixAudioWidget(QWidget *parent) : QWidget(parent){
     });
     connect(&player, SIGNAL(positionChanged(qint64)), SLOT(setSliderTrackPosition(qint64)));
     connect(sliderVolume, SIGNAL(valueChanged(int)), &player, SLOT(setVolume(int)));
-    connect(sliderTrack, SIGNAL(valueChanged(int)), SLOT(setSongValue(int)));
+    connect(sliderTrack, SIGNAL(sliderReleased()), SLOT(setSongValue()));
     connect(sliderTrack, QSlider::sliderPressed, this, [&](){ isSliderTrackPressed = true; });
-    connect(sliderTrack, QSlider::sliderReleased, this, [&](){ isSliderTrackPressed = false; });
+    connect(mainWidget, SIGNAL(released()), SLOT(musicControl()));
 }
 
-QWidget *AffixAudioWidget::getMainWidget() const{
+
+QPushButton *AffixAudioWidget::getMainWidget() const{
     return mainWidget;
 }
 
@@ -162,9 +173,15 @@ void AffixAudioWidget::loading(){
 
 void AffixAudioWidget::setSliderTrackPosition(qint64 position){
     if(player.duration() != 0 && !isSliderTrackPressed)
-        sliderTrack->setValue((position / player.duration()) * 100);
+        sliderTrack->setValue((position*100) / player.duration());
+    if(position == player.duration()){
+        sliderTrack->setValue(0);
+        player.setPosition(0);
+        musicControl();
+    }
 }
 
-void AffixAudioWidget::setSongValue(int value){
-    player.setPosition(value*(player.duration()/100));
+void AffixAudioWidget::setSongValue(){
+    player.setPosition(sliderTrack->value()*(player.duration()/100));
+    isSliderTrackPressed = false;
 }
